@@ -47,7 +47,7 @@
             <Avatar userProfile={{id:note.pubkey}} klass="h-8" />
 
             <div class="text-normal text-slate-700 font-semibold">
-                <Name userProfile={{id:note.pubkey}} />
+                <Name pubkey={note.pubkey} />
             </div>
         </div>
 

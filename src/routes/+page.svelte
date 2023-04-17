@@ -3,67 +3,97 @@
 	import MyHighlightsIcon from '$lib/icons/MyHighlights.svelte';
     import GlobalIcon from '$lib/icons/Global.svelte';
     import FollowsIcon from '$lib/icons/Follows.svelte';
+    import AboutIcon from '$lib/icons/About.svelte';
+    import HowIcon from '$lib/icons/How.svelte';
 
 	import { Tooltip } from 'flowbite-svelte';
-
 
 	import HighlightInterface from '$lib/interfaces/highlights';
 
 	import { ndk } from '$lib/store';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import HighlightList from '$lib/components/HighlightList.svelte';
 	import Hero from '$lib/components/Hero.svelte';
-	import UserInterface from '$lib/interfaces/users';
 	import RadioButton from '$lib/components/buttons/radio.svelte';
 	import About from '$lib/components/About.svelte';
+	import How from '$lib/components/How.svelte';
+	import type { NDKSubscription } from '@nostr-dev-kit/ndk';
 
 	let highlights;
     let _highlights: App.Highlight[] = [];
+	let activeSubs: NDKSubscription | undefined;
 
 	onMount(async () => {
 		const urlMode = window.location.hash.replace('#', '');
-		if (urlMode && ['my', 'global', 'network', 'about'].includes(urlMode)) {
+		if (urlMode && ['my', 'global', 'network', 'about', 'how'].includes(urlMode)) {
 			mode = urlMode;
 		}
 
-        setTimeout(() => {
-            highlights = HighlightInterface.load();
-        }, 100);
+		setMode();
     });
 
-	$: {
-		_highlights = ($highlights || []) as App.Highlight[];
-
-		if (_highlights) {
-			// request responses and profiles
-			UserInterface
+	onDestroy(() => {
+		if (activeSubs) {
+			activeSubs.stop();
+			activeSubs = undefined;
 		}
+	});
+
+	let allPubkeys = [];
+	let renderedAt: string;
+
+	$: {
+		if ($highlights) {
+			console.log($highlights);
+
+			allPubkeys = Array.from(new Set(($highlights||[]).map((h: App.Highlight) => h.pubkey)));
+		}
+
+		_highlights = (($highlights || []) as App.Highlight[]).sort((a, b) => {
+			return b.timestamp - a.timestamp;
+		});
+
+		_highlights = _highlights;
+		renderedAt = (new Date()).toLocaleString();
 	}
 
-	async function myHighlights() {
+	let currentUser: string;
+
+	async function myHighlights(): Promise<NDKSubscription | undefined> {
 		const user = await $ndk.signer?.user();
 		if (!user) return;
 
-		highlights = HighlightInterface.load({
-			pubkeys: [user.hexpubkey()]
-		});
+		currentUser = user.npub;
+
+		const opts = { pubkeys: [user.hexpubkey()] };
+		highlights = HighlightInterface.load(opts);
+		return HighlightInterface.startStream(opts);
 	}
 
-	async function globalHighlights() {
+	function globalHighlights() {
 		highlights = HighlightInterface.load();
+		return HighlightInterface.startStream();
 	}
 
 	// check if there is anchor on the URL, if there is, use that as the mode
 	// otherwise, use 'global'
 	let mode = 'global';
 
-	function setMode(newMode: string, prevMode: string) {
+	async function setMode() {
+		highlights = null;
+		_highlights = [];
+
+		if (activeSubs) {
+			activeSubs.stop();
+			activeSubs = undefined;
+		}
+
 		switch (mode) {
 			case 'my':
-				myHighlights();
+				activeSubs = await myHighlights();
 				break;
 			case 'global':
-				globalHighlights();
+				activeSubs = globalHighlights();
 				break;
 			case 'network':
 				break;
@@ -97,19 +127,27 @@
 		</RadioButton>
 		<Tooltip>Global Feed</Tooltip>
 
-		<RadioButton bind:group={mode} on:change={setMode} value="about">About</RadioButton>
+		<RadioButton bind:group={mode} on:change={setMode} value="about">
+			<AboutIcon />
+			About
+		</RadioButton>
+
+		<RadioButton bind:group={mode} on:change={setMode} value="how">
+			<HowIcon />
+			How
+		</RadioButton>
 	</div>
 
 	{#if mode === 'about'}
 		<About />
+	{:else if mode === 'how'}
+		<How />
 	{:else if mode === 'my' || mode === 'global'}
-		{#if $highlights}
-			<div class="grid grid-cols-1 gap-8">
-				{#each $highlights as highlight}
-					<HighlightList {highlight} />
-				{/each}
-			</div>
-		{/if}
+		<div class="grid grid-cols-1 gap-8">
+			{#each _highlights as highlight}
+				<HighlightList {highlight} />
+			{/each}
+		</div>
 	{:else if mode === 'network'}
 		<div class="text-center text-slate-300 flex flex-col items-center">
 			<div class="text-2xl my-4">
@@ -119,10 +157,10 @@
 	{/if}
 </main>
 
-<footer class="py-6 font-mono text-white text-center mt-12 px-10 fixed bottom-0 w-full bg-gray-1000 border-t border-t-gray-800">
+<footer class="py-6 font-mono text-white text-center mt-12 px-10 fixed bottom-0 w-full bg-gray-1000 border-t border-t-zinc-900">
 	<div class="flex justify-center flex-row">
 		<div class="text-sm">
-			ZAPWORDTHY
+			ZAPWORTHY
 			by
 			<a class="text-purple-50 hover:text-orange-400" href="https://pablof7z.com">
 				@pablof7z

@@ -8,6 +8,7 @@
     import {nip19} from 'nostr-tools';
     import type { AddressPointer } from 'nostr-tools/lib/nip19';
 
+    export let url: string;
     let probablyReaderable: boolean;
 
     function markHighlightInDoc(range: Range) {
@@ -34,8 +35,8 @@
 
         // check if this url has an naddr on the path
         // if so, publish to that naddr
-        const url = new URL(window.location.href);
-        const pathParts = url.pathname.split('/');
+        const currentUrl = new URL(url);
+        const pathParts = currentUrl.pathname.split('/');
         const lastPathPart = pathParts[pathParts.length - 1];
         let naddr;
         let tags = [];
@@ -54,7 +55,7 @@
             content: selectedText,
             created_at: Math.floor(Date.now() / 1000),
             tags: [
-                ['r', window.location.href],
+                ['r', url],
                 ...tags,
             ],
         } as any);
@@ -96,14 +97,12 @@
             tags,
         } as any);
 
-        console.log(await postEvent.toNostrEvent());
-
         await postEvent.sign();
-        alert(await postEvent.encode());
         await $ndk.publish(postEvent);
     }
 
     onMount(() => {
+        if (!url) url = (new URL(window.location.href)).href;
         const reader = new Readability(document);
         probablyReaderable = isProbablyReaderable(document);
         $ndk.connect();

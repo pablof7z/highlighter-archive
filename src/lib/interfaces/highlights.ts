@@ -25,26 +25,21 @@ const HighlightInterface = {
         );
     },
 
-    load: (opts: ILoadOpts = {}) => {
-        const filter: NDKFilter = { kinds: [9801], limit: 1 };
-        if (opts.pubkeys) filter['authors'] = opts.pubkeys;
-
+    startStream: (opts: ILoadOpts = {}) => {
         let articleReference: string | undefined;
+        const ndk: NDK = getStore(ndkStore);
+        const filter: NDKFilter = { kinds: [9801] };
 
+        if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.articleNaddr) {
             const ndecode = nip19.decode(opts.articleNaddr).data as any;
             articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
             filter['#a'] = [articleReference];
         }
-
         if (opts.url) filter['#r'] = [opts.url];
 
-        console.log({filter});
-
-
-        const ndk: NDK = getStore(ndkStore);
-
-        const subs = ndk.subscribe(filter);
+        const subs = ndk.subscribe(filter, { closeOnEose: false });
+        console.log('highlights subscribed to', filter);
 
         subs.on('event', async (event: NDKEvent) => {
             const url = valueFromTag(event, 'r');
@@ -60,6 +55,7 @@ const HighlightInterface = {
                     pubkey: event.pubkey,
                     content: event.content,
                     articleId,
+                    timestamp: event.created_at || Math.floor(Date.now() / 1000),
                     event: JSON.stringify(await event.toNostrEvent())
                 };
 
@@ -69,11 +65,20 @@ const HighlightInterface = {
             }
         });
 
+        return subs;
+    },
+
+    load: (opts: ILoadOpts = {}) => {
         if (opts.pubkeys) {
             return liveQuery(() =>
                 db.highlights.where('pubkey').anyOf(opts.pubkeys as string[]).toArray()
             );
-        } else if (articleReference) {
+        } else if (opts.articleNaddr) {
+            let articleReference: string | undefined;
+
+            const ndecode = nip19.decode(opts.articleNaddr).data as any;
+            articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
+
             return liveQuery(() =>
                 db.highlights.where({articleId: articleReference}).toArray()
             );

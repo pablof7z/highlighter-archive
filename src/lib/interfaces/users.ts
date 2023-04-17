@@ -1,6 +1,6 @@
 import { get as getStore } from 'svelte/store';
 import {ndk as ndkStore} from '$lib/store';
-import type { GetUserParams } from '@nostr-dev-kit/ndk';
+import type { GetUserParams, NDKFilterOptions } from '@nostr-dev-kit/ndk';
 import { liveQuery, type Observable } from 'dexie';
 import { browser } from '$app/environment';
 import { db } from '$lib/interfaces/db';
@@ -11,10 +11,11 @@ const UserInterface = {
 
         const ndk = getStore(ndkStore);
         const user = ndk.getUser(opts);
-        let userProfile = { ...(user.profile || {}), id: user.hexpubkey() };
+        let userProfile: App.UserProfile = { event: '', ...(user.profile || {}), id: user.hexpubkey() };
 
-        user.fetchProfile().then(async () => {
+        user.fetchProfile({ groupableDelay: 1000 } as NDKFilterOptions).then(async (events) => {
             userProfile = { ...userProfile, ...(user.profile || {}) };
+            if (events && events.size > 0) userProfile.event = JSON.stringify(Array.from(events)[0].rawEvent());
             await db.users.put(userProfile);
         });
 

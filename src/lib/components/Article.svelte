@@ -1,4 +1,6 @@
-<div class="text-lg sm:p-8 sm:bg-white sm:shadow-2xl text-justify text-slate-700 leading-loose">
+<div class="
+    text-xl sm:p-8 bg-zinc-900 sm:shadow-2xl text-justify text-gray-300 leading-loose
+">
     <slot />
 </div>
 
@@ -46,5 +48,11 @@
         max-height: 420px !important;
         max-width: 100% !important;
         margin: 1rem auto;
+    }
+
+    :global(article mark) {
+        background-color: rgb(227, 151, 35);
+        color: black;
+        padding: 0.25rem;
     }
 </style>

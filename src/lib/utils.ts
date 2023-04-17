@@ -16,7 +16,7 @@ function flattenText(node: string) {
     return texts;
 }
 
-export function highlightText(targetText: string) {
+export function highlightText(targetText: string, highlightId: string) {
     const regex = new RegExp(escapeRegExp(targetText), 'g');
     const textNodes = flattenText(document.body);
     const marks = [];
@@ -27,13 +27,14 @@ export function highlightText(targetText: string) {
 
         while ((match = regex.exec(textNode.data)) !== null) {
             const mark = document.createElement('mark');
+            mark.setAttribute('data-highlight-id', highlightId);
             const range = document.createRange();
             const startOffset = match.index;
             const endOffset = startOffset + targetText.length;
 
             if (lastIndex < startOffset) {
-            const precedingTextNode = document.createTextNode(textNode.data.slice(lastIndex, startOffset));
-            textNode.parentNode.insertBefore(precedingTextNode, textNode);
+                const precedingTextNode = document.createTextNode(textNode.data.slice(lastIndex, startOffset));
+                textNode.parentNode.insertBefore(precedingTextNode, textNode);
             }
 
             range.setStart(textNode, startOffset);

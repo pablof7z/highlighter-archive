@@ -3,14 +3,18 @@
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
     import { onMount } from 'svelte';
     import Container from './Container.svelte';
+    import Highlight from '$lib/components/Highlight.svelte';
     import HighlightInterface from '$lib/interfaces/highlights.js';
     import { highlightText } from '$lib/utils';
+    import {nip19} from 'nostr-tools';
 
     let minimizeChat = true;
+    export let url: string;
     export let loadHighlights = true;
     export let position = 'top-5 right-5 flex-col';
-    let highlights;
     let replacedHighlights: Record<string, boolean> = {};
+    let highlights;
+    let _highlights: App.Highlight[] = [];
 
     onMount(async () => {
         try {
@@ -20,11 +24,30 @@
         }
         await $ndk.connect();
 
-        const url = new URL(window.location.href);
+        if (!url) url = (new URL(window.location.href)).href;
 
-        if (loadHighlights) {
-            highlights = HighlightInterface.load({ url: url.href });
+        if (loadHighlights && url) {
+            setTimeout(() => {
+                highlights = HighlightInterface.load({ url });
+            }, 1000);
         }
+
+        // create a trigger at the document level so that every time an element with [data-highlight-id] is clicked, we can
+        // open a popup with a URL with the ID
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const highlightId = target.getAttribute('data-highlight-id');
+
+            if (highlightId) {
+                const highlight = _highlights.find(h => h.id === highlightId);
+
+                if (highlight) {
+                    const noteEncode = nip19.noteEncode(highlight.id);
+                    const url = new URL('http://localhost:5173/e/'+noteEncode);
+                    window.open(url.href, '_blank');
+                }
+            }
+        });
     })
 
     function toggleChat() {
@@ -36,17 +59,18 @@
             // @ts-ignore
             for (const highlight of $highlights) {
                 if (replacedHighlights[highlight.id]) continue;
-                console.log(highlight.id, highlight.content);
 
                 try {
                     replacedHighlights[highlight.id] = true; // don't retry if it failed
-                    highlightText(highlight.content);
+                    highlightText(highlight.content, highlight.id);
                 } catch (e) {
                     console.error(e);
                     continue;
                 }
             }
         }
+
+        _highlights = ($highlights || []) as App.Highlight[];
     }
 </script>
 
@@ -72,7 +96,7 @@
         flex flex-col justify-end
         {minimizeChat ? 'hidden' : ''}
     " style="max-height: 80vh;">
-        <Container />
+        <Container {url} />
     </div>
 </div>
 

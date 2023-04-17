@@ -5,14 +5,16 @@ export class Database extends Dexie {
     highlights!: Table<App.Highlight>;
     notes!: Table<App.Note>;
     users!: Table<App.UserProfile>;
+    zaps!: Table<App.Zap>;
 
     constructor() {
-        super('db');
-        this.version(15).stores({
+        super('zapworthy');
+        this.version(17).stores({
             articles: '++id, url, publisher, content, author, event, title',
-            highlights: 'id, url, pubkey, event, content, articleId',
-            notes: 'id, url, pubkey, replyToArticleId, replyToEventId, event, content',
-            users: '++id, name, displayName, image, banner, bio, nip05, lud16, about, zapService',
+            highlights: '++id, url, pubkey, event, content, articleId, timestamp',
+            notes: '++id, url, pubkey, replyToArticleId, replyToEventId, event, content',
+            users: '++id, name, displayName, image, banner, bio, nip05, lud16, about, zapService, event',
+            zaps: '++id, zapper, zappee, zapped, zappedEvent, amount, comment, event'
         });
     }
 }

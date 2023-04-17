@@ -1,24 +1,29 @@
 <script lang="ts">
-    import { Avatar, Tooltip } from 'flowbite-svelte';
     import UserInterface from '$lib/interfaces/users';
+    import type { Observable } from 'dexie';
 
-    export let userProfile: App.UserProfile;
-    export let klass: string | undefined;
+    export let pubkey: string | undefined = undefined;
+    export let userProfile: App.UserProfile | undefined = undefined;
+    export let klass: string = '';
+    let prevPubkey: string | undefined = undefined;
 
-    const id = userProfile.id;
-    let _userProfile = userProfile;
-    let image: string | undefined;
-    let defaultImage = `https://robohash.org/${userProfile.id?.slice(0, 1)}`;
+    let defaultImage = `https://robohash.org/${pubkey?.slice(0, 1)}`;
 
-    let observeUserProfile;
-
-    if (!_userProfile?.image) {
-        observeUserProfile = UserInterface.get({ hexpubkey: _userProfile.id });
-    }
+    let observeUserProfile: Observable<App.UserProfile> | undefined = undefined;
+    let image: string | undefined = userProfile?.image;
 
     $: {
-        _userProfile = $observeUserProfile! as App.UserProfile;
-        image = _userProfile?.image;
+        if (pubkey !== prevPubkey && !userProfile) {
+            prevPubkey = pubkey;
+            observeUserProfile = UserInterface.get({ hexpubkey: pubkey });
+        }
+
+        if (observeUserProfile && $observeUserProfile) {
+            userProfile = ($observeUserProfile||{}) as App.UserProfile;
+        }
+
+        defaultImage = `https://robohash.org/${pubkey?.slice(0, 1)}`;
+        image = userProfile?.image || defaultImage;
     }
 </script>
 

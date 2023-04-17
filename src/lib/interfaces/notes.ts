@@ -15,6 +15,7 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
 interface ILoadOpts {
     pubkeys?: string[];
     articleNaddr?: string;
+    replies?: string[];
 };
 
 const NoteInterface = {
@@ -33,6 +34,7 @@ const NoteInterface = {
     load: (opts: ILoadOpts = {}) => {
         const filter: NDKFilter = { kinds: [1] };
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
+        if (opts.replies) filter['#e'] = opts.replies;
 
         let articleReference: string | undefined;
 
@@ -44,7 +46,7 @@ const NoteInterface = {
 
         const ndk: NDK = getStore(ndkStore);
 
-        const subs = ndk.subscribe(filter);
+        const subs = ndk.subscribe(filter, { closeOnEose: false, groupableDelay: 500 });
 
         subs.on('event', async (event: NDKEvent) => {
             try {
@@ -72,7 +74,11 @@ const NoteInterface = {
             );
         } else if (articleReference) {
             return liveQuery(() =>
-                db.notes.where({articleNaddr: articleReference}).toArray()
+                db.notes.where({replyToArticleId: articleReference}).toArray()
+            );
+        } else if (opts.replies) {
+            return liveQuery(() =>
+                db.notes.where('replyToEventId').anyOf(opts.replies!).toArray()
             );
         } else {
             return liveQuery(() => (db.notes.toArray()));

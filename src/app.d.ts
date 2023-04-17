@@ -17,6 +17,7 @@ declare global {
             content: string;
             articleId?: string;
             event: string;
+            timestamp: number;
         }
 
         interface Note {
@@ -39,6 +40,18 @@ declare global {
             lud16?: string;
             about?: string;
             zapService?: string;
+            event: string;
+        }
+
+        interface Zap {
+            id?: string;
+            zapper: string; // pubkey of zapper app
+            zappee: string; // pubkey of user sending zap
+            zapped: string; // pubkey of user receiving zap
+            zappedNote?: string; // note from zapper to zapped
+            amount: number;
+            comment?: string;
+            event: string;
         }
     }
 }

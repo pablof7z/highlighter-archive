@@ -1,6 +1,6 @@
 <script lang="ts">
     import Avatar from '$lib/components/Avatar.svelte';
-    import { ndk } from '$lib/store';
+    import { ndk, } from '$lib/store';
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';
@@ -11,17 +11,20 @@
     import ZapIcon from '$lib/icons/Zap.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
     import { onMount } from 'svelte';
-  import Zap from '$lib/icons/Zap.svelte';
+    import ZapModal from '$lib/modals/Zap.svelte';
+    import { Tooltip } from 'flowbite-svelte';
+    import { openModal } from 'svelte-modals'
 
     export let highlight: App.Highlight;
     export let skipUrl: boolean = false;
 
     let replies;
     let article;
+    let zap = false;
 
     onMount(() => {
         if (highlight?.id) {
-            replies = NoteInterface.fromCacheRepliesTo(highlight.id);
+            replies = NoteInterface.load({ replies: [highlight.id] });
 
             if (highlight.articleId) {
                 article = ArticleInterface.load({ id: highlight.articleId });
@@ -53,7 +56,6 @@
         // see if there is an element that has attribute data-highlight with the id of the highlight
         // if there is, then we want to scroll to that element
         const el = document.querySelector(`[data-highlight-id="${highlight.id}"]`);
-        console.log(el, highlight.id);
         if (el) {
 
             el.scrollIntoView({ behavior: 'smooth' });
@@ -72,9 +74,9 @@
     shadow
 ">
     <div class="flex flex-col items-center h-full">
-        <a href={urlFor(highlight)} class="text-lg my-8 p-4 text-slate-700 h-full justify-center items-center flex flex-col text-justify"
-            on:click={onClick}
-        >
+        <a href={urlFor(highlight)} class="
+            text-lg mt-2 px-6 py-4 text-slate-700 h-full justify-center items-center flex flex-col text-justify
+        " on:click={onClick}>
             {highlight.content}
         </a>
 
@@ -84,7 +86,7 @@
             justify-between
             w-full
             rounded-b-lg
-            p-4
+            px-4 pb-4
         ">
             <div class="flex flex-row gap-4 items-center">
                 <Avatar userProfile={{id:highlight.pubkey}} klass="h-8" />
@@ -99,12 +101,17 @@
             </div>
 
             <div class="flex flex-row gap-4 items-center">
-                <button class="text-slate-500 hover:text-purple-700">
-                    <ZapIcon />
-                </button>
+                <button
+                    class="text-slate-500 hover:text-purple-700"
+                    on:click={() => { openModal(ZapModal, { highlight, article }) }}
+                ><ZapIcon /></button>
+                <Tooltip>Zap</Tooltip>
+
                 <button class="text-slate-500 hover:text-purple-700">
                     <BoostIcon />
                 </button>
+                <Tooltip>Boost</Tooltip>
+
                 <button
                     class="text-slate-500 hover:text-purple-700"
                     on:click={() => { console.log('change', showComment); showComment = !showComment }}

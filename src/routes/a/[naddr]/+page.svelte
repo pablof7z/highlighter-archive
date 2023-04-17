@@ -3,7 +3,7 @@
     import GlobalIcon from '$lib/icons/Global.svelte';
     import FollowsIcon from '$lib/icons/Follows.svelte';
 	import RadioButton from '$lib/components/buttons/radio.svelte';
-	import Highlight from '$lib/components/Highlight.svelte';
+	import Highlight from '$lib/components/HighlightList.svelte';
     import { page } from '$app/stores';
     import ArticleInterface from '$lib/interfaces/article';
     import HighlightInterface from '$lib/interfaces/highlights';
@@ -21,19 +21,19 @@
 
     let mode = 'global';
 
-    function setMode() {
-        switch (mode) {
-            case 'my':
-                myHighlights();
-                break;
-            case 'global':
-                globalHighlights();
-                break;
-            case 'network':
-                alert('coming soon™️!');
-                break;
-        }
-    }
+    // function setMode() {
+    //     switch (mode) {
+    //         case 'my':
+    //             myHighlights();
+    //             break;
+    //         case 'global':
+    //             globalHighlights();
+    //             break;
+    //         case 'network':
+    //             alert('coming soon™️!');
+    //             break;
+    //     }
+    // }
 
     let articles;
     let _articles: App.Article[] = [];
@@ -45,6 +45,7 @@
 
     let notes;
     let _notes: App.Note[] = [];
+    let activeSub: NDKSubscription | undefined;
 
     onMount(async () => {
         document.addEventListener('selectionchange', () => {
@@ -57,6 +58,7 @@
         setTimeout(() => {
             articles = ArticleInterface.load({naddr});
             highlights = HighlightInterface.load({articleNaddr: naddr});
+            activeSub = HighlightInterface.startStream({articleNaddr: naddr});
             notes = NoteInterface.load({articleNaddr: naddr});
         }, 1000);
     });
@@ -84,9 +86,9 @@
     }
 </script>
 
-{#if article}
-    <div class="flex flex-col sm:flex-row w-screen sm:gap-12">
-        <div class="sm:w-3/5 text-lg p-8 bg-slate-50 shadow-lg text-justify text-slate-700 leading-loose flex flex-col gap-2">
+<div class="flex flex-col sm:flex-row w-screen sm:gap-12">
+    <div class="sm:w-3/5 text-lg p-8 bg-black shadow-lg text-justify text-slate-700 leading-loose flex flex-col gap-2">
+        {#if article}
             <!-- Title -->
             <h1 class="text-3xl sm:text-5xl font-black font-sans leading-normal">{article.title}</h1>
 
@@ -95,9 +97,9 @@
                 {#if article?.author}
                     <h2 class="flex flex-row items-center text-sm sm:text-sm gap-4">
                         <div class="flex flex-row gap-4 items-start">
-                            <Avatar userProfile={{id:article.author}} klass="h-8" />
+                            <Avatar pubkey={article.author} klass="h-8" />
                             <div class=" text-gray-500 text-lg">
-                                <Name userProfile={{id:article.author}} />
+                                <Name pubkey={article.author} />
                             </div>
                         </div>
                     </h2>
@@ -114,8 +116,8 @@
                     <h2 class="flex flex-row items-center text-sm sm:text-sm gap-4">
                         Published by
                         <div class="flex flex-row items-center gap-2">
-                            <Avatar userProfile={{id:article.publisher}} klass="h-10" />
-                            <Name userProfile={{id:article.publisher}} />
+                            <Avatar pubkey={article.publisher} klass="h-10" />
+                            <Name pubkey={article.publisher} />
                         </div>
                     </h2>
                 {/if}
@@ -137,49 +139,49 @@
                     {@html content}
                 </Article>
             </article>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="sm:w-2/5 p-8 pt-4 sm:h-screen sm:overflow-scroll sm:fixed right-0">
-            <div class="flex flex-row items-center justify-between mb-8">
-                <div>
-                    <a href="/" class="
-                        text-gray-300 hover:text-white
-                        font-semibold
-                    " name="highlights">
-                        ⚡️ ZAPWORDTHY
-                    </a>
-                </div>
-
-                <div class="flex flex-row text-slate-300 items-center justify-center
-                    text-xs sm:text-lg
-                ">
-                    <RadioButton bind:group={mode} on:change={setMode} value="my">
-                        <MyHighlightsIcon />
-                    </RadioButton>
-                    <Tooltip placement="bottom">My Highlights</Tooltip>
-
-                    <RadioButton bind:group={mode} on:change={setMode} value="global">
-                        <GlobalIcon />
-                    </RadioButton>
-                    <Tooltip placement="bottom">Global Highlights Feed</Tooltip>
-
-                    <RadioButton bind:group={mode} on:change={setMode} value="network">
-                        <FollowsIcon />
-                    </RadioButton>
-                    <Tooltip placement="bottom">Highlights from people you follow</Tooltip>
-                </div>
-            </div>
-
-            {#if _highlights}
-                <div class="flex flex-col gap-6">
-                    {#each _highlights as highlight}
-                        <Highlight {highlight} skipUrl={true} />
-                    {/each}
-                </div>
-            {/if}
-        </div>
+        {/if}
     </div>
 
-    <Widget loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" />
-{/if}
+    <!-- Sidebar -->
+    <div class="sm:w-2/5 p-8 pt-4 sm:h-screen sm:overflow-scroll sm:fixed right-0">
+        <div class="flex flex-row items-center justify-between mb-8">
+            <div>
+                <a href="/" class="
+                    text-zinc-400 hover:text-white
+                    font-semibold
+                " name="highlights">
+                    ⚡️ <span class="font-black">ZAP</span>WORTHY
+                </a>
+            </div>
+
+            <div class="flex flex-row text-slate-300 items-center justify-center
+                text-xs sm:text-lg
+            ">
+                <RadioButton bind:group={mode} value="my">
+                    <MyHighlightsIcon />
+                </RadioButton>
+                <Tooltip placement="bottom">My Highlights</Tooltip>
+
+                <RadioButton bind:group={mode} value="global">
+                    <GlobalIcon />
+                </RadioButton>
+                <Tooltip placement="bottom">Global Highlights Feed</Tooltip>
+
+                <RadioButton bind:group={mode} value="network">
+                    <FollowsIcon />
+                </RadioButton>
+                <Tooltip placement="bottom">Highlights from people you follow</Tooltip>
+            </div>
+        </div>
+
+        {#if _highlights}
+            <div class="flex flex-col gap-6">
+                {#each _highlights as highlight}
+                    <Highlight {highlight} skipUrl={true} skipTitle={true} />
+                {/each}
+            </div>
+        {/if}
+    </div>
+</div>
+
+<Widget loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" />

@@ -1,5 +1,5 @@
 <div class="text-gray-200 text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6">
-    <p>Zapwordthy is a feed of a new kind of Nostr event:</p>
+    <p>Zapworthy is a feed of a new kind of Nostr event:</p>
 
     <p class="text-white font-semibold"><mark class="px-2 py-1">Highlights</mark></p>
 
@@ -15,9 +15,9 @@
     <h3 class="text-3xl font-bold font-serif text-white">Origin</h3>
 
     <p>
-        I started working on Zapwordthy basically immediately after reading
-        <span class="text-purple-500">@dergigi</span>'s excellent
-        <em><a href="#" class="text-purple-500">Purple Text. Orange Highlights</a></em>,
+        I started working on Zapworthy basically immediately after reading
+        <span class="text-orange-500">@dergigi</span>'s excellent
+        <em><a href="#" class="text-orange-500">Purple Text. Orange Highlights</a></em>,
         and was fascinated by the idea of using Nostr to create a new
         method to improve the current tooling around reading and discovering
         new valuable content.

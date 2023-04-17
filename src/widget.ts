@@ -1,5 +1,6 @@
 import Widget from './Widget.svelte';
 
+
 var div = document.createElement('DIV');
 // var script = document.currentScript;
 let relays; // = script.getAttribute('data-relays');

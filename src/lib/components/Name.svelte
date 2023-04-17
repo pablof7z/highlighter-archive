@@ -1,22 +1,29 @@
 <script lang="ts">
     import UserInterface from '$lib/interfaces/users';
+    import type { Observable } from 'dexie';
 
-    export let userProfile: App.UserProfile;
+    export let pubkey: string | undefined = undefined;
+    export let userProfile: App.UserProfile | undefined = undefined;
 
-    const id = userProfile.id;
-    let _userProfile = userProfile;
-    let name: string | undefined;
-    let defaultName = `[${userProfile.id?.slice(0, 5)}]`;
+    let prevPubkey: string | undefined = undefined;
 
-    let observeUserProfile;
+    let defaultName = `[${pubkey?.slice(0, 5)}]`;;
 
-    if (!_userProfile?.displayName) {
-        observeUserProfile = UserInterface.get({ hexpubkey: _userProfile.id });
-    }
+    let observeUserProfile: Observable<App.UserProfile> | undefined = undefined;
+    let name: string | undefined = userProfile?.displayName;
 
     $: {
-        _userProfile = $observeUserProfile! as App.UserProfile;
-        name = _userProfile?.displayName || defaultName;
+        if (pubkey !== prevPubkey && !userProfile) {
+            prevPubkey = pubkey;
+            observeUserProfile = UserInterface.get({ hexpubkey: pubkey });
+        }
+
+        if (observeUserProfile && $observeUserProfile) {
+            userProfile = ($observeUserProfile||{}) as App.UserProfile;
+        }
+
+        defaultName = `[${pubkey?.slice(0, 5)}]`;
+        name = userProfile?.displayName || defaultName;
     }
 </script>
 
