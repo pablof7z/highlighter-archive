@@ -26,7 +26,7 @@
 
 	onMount(async () => {
 		const urlMode = window.location.hash.replace('#', '');
-		if (urlMode && ['my', 'global', 'network', 'about', 'how'].includes(urlMode)) {
+		if (urlMode && ['my', 'global', 'network', 'what', 'how'].includes(urlMode)) {
 			mode = urlMode;
 		}
 
@@ -76,9 +76,7 @@
 		return HighlightInterface.startStream();
 	}
 
-	// check if there is anchor on the URL, if there is, use that as the mode
-	// otherwise, use 'global'
-	let mode = 'global';
+	let mode = 'what';
 
 	async function setMode() {
 		highlights = null;
@@ -128,9 +126,9 @@
 		</RadioButton>
 		<Tooltip>Global Feed</Tooltip>
 
-		<RadioButton bind:group={mode} on:change={setMode} value="about">
+		<RadioButton bind:group={mode} on:change={setMode} value="what">
 			<AboutIcon />
-			<span class="hidden sm:block">About</span>
+			<span class="hidden sm:block">What</span>
 		</RadioButton>
 
 		<RadioButton bind:group={mode} on:change={setMode} value="how">
@@ -139,7 +137,7 @@
 		</RadioButton>
 	</div>
 
-	{#if mode === 'about'}
+	{#if mode === 'what'}
 		<About />
 	{:else if mode === 'how'}
 		<How />

@@ -84,7 +84,7 @@
             flex flex-row items-center justify-center gap-4
             transition-all duration-300
         " on:click|preventDefault={toggleWidget}>
-            <img src="https://b0e77f76a9f6.ngrok.app/images/logo.png" class="rounded-full" />
+            <img src="https://zapworthy.com/images/logo.png" class="rounded-full" />
         </a>
     </div>
     {#if !minimizeWidget}

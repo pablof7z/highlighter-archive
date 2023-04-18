@@ -28,7 +28,7 @@ const HighlightInterface = {
     startStream: (opts: ILoadOpts = {}) => {
         let articleReference: string | undefined;
         const ndk: NDK = getStore(ndkStore);
-        const filter: NDKFilter = { kinds: [9801] };
+        const filter: NDKFilter = { kinds: [9802] };
 
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.articleNaddr) {
@@ -39,7 +39,6 @@ const HighlightInterface = {
         if (opts.url) filter['#r'] = [opts.url];
 
         const subs = ndk.subscribe(filter, { closeOnEose: false });
-        console.log('highlights subscribed to', filter);
 
         subs.on('event', async (event: NDKEvent) => {
             const url = valueFromTag(event, 'r');

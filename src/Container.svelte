@@ -66,7 +66,7 @@
         }
 
         const event = new NDKEvent($ndk, {
-            kind: 9801,
+            kind: 9802,
             content: selectedText,
             created_at: Math.floor(Date.now() / 1000),
             tags: [
@@ -105,7 +105,7 @@
         const content = turndownService.turndown(article.content);
 
         const postEvent = new NDKEvent($ndk, {
-            kind: 9801,
+            kind: 9802,
             content,
             created_at: Math.floor(Date.now() / 1000),
             tags,

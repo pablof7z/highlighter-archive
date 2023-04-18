@@ -32,7 +32,6 @@
     import { Connect, ConnectURI } from '@nostr-connect/connect';
 
     async function useDiscardableKeys() {
-
         // chatAdapter.set(new NstrAdapterDiscadableKeys(adapterConfig))
     }
 

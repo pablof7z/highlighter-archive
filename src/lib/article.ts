@@ -6,7 +6,6 @@ export async function fetchArticle(url: string) {
     const json = await response.json();
 
     const html = json.contents;
-    console.log(html);
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");

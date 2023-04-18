@@ -222,7 +222,7 @@
             <button class="
                 text-slate-500 hover:text-orange-500
                 flex flex-row items-center gap-2
-            " on:click={() => {}}>
+            " on:click={() => {alert('soonTM')}}>
                 <BookmarkIcon />
             </button>
             <Tooltip>Bookmark</Tooltip>
@@ -230,7 +230,7 @@
             <button class="
                 text-slate-500 hover:text-orange-500
                 flex flex-row items-center gap-2
-            " on:click={() => { showComments = !showComments }}>
+            " on:click={() => { showComments = !showComments; showReplies = showComments; }}>
                 <CommentIcon />
                 {($replies||[]).length}
             </button>

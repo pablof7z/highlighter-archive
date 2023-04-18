@@ -20,7 +20,6 @@ const ZapInterface = {
 
         const ndk: NDK = getStore(ndkStore);
         const subs = ndk.subscribe(filter, { closeOnEose: false, groupableDelay: 2500 });
-        console.log('zaps subscribed to', filter);
 
         subs.on('event', async (event: NDKEvent) => {
             const zapInvoice: NDKZapInvoice | null = zapInvoiceFromEvent(event);

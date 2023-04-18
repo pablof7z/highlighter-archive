@@ -19,7 +19,7 @@ function flattenText(node: string) {
 export function highlightText(targetText: string, highlightId: string) {
     const regex = new RegExp(escapeRegExp(targetText), 'g');
     const textNodes = flattenText(document.body);
-    const marks = [];
+    const marks: HTMLElement[]  = [];
 
     textNodes.forEach((textNode) => {
         let match;
