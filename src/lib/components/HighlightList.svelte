@@ -80,6 +80,19 @@
                     identifier
                 })
                 articleLink = `/a/${naddr}`;
+            } else {
+                // see if this highlight.event has a p tag
+                try {
+                    const event = new NDKEvent(undefined, JSON.parse(highlight.event));
+                    const pTag = event.getMatchingTags('p')[0];
+
+                    articleLink = `/load?url=${encodeURIComponent(highlight.url)}`
+
+                    if (pTag && pTag[1]) {
+                        articleLink += `&author=${encodeURIComponent(pTag[1])}`;
+                    }
+                } catch (e) {
+                }
             }
 
             replies = NoteInterface.load({ replies: [highlight.id] });
@@ -120,8 +133,8 @@
 
     {#if !skipTitle}
         <!-- Title -->
-        <div class="flex flex-row justify-between items-start overflow-clip">
-            <div class="flex flex-col gap-2 whitespace-nowrap text-ellipsis">
+        <div class="flex flex-row justify-between items-start">
+            <div class="flex flex-col gap-2">
                 <a href={articleLink} class="
                     text-gray-600
                     font-semibold text-2xl
@@ -132,7 +145,7 @@
                 {#if article?.author}
                     <div class="flex flex-row gap-4 items-start">
                         <Avatar pubkey={article.author} klass="h-8" />
-                        <div class=" text-gray-500 text-lg whitespace-nowrap">
+                        <div class=" text-gray-500 text-lg">
                             <Name pubkey={article.author} />
                         </div>
                     </div>
@@ -174,7 +187,6 @@
         rounded-b-lg
         py-4
         pb-0
-        overflow-clip
     ">
         <div class="flex flex-row gap-4 items-center whitespace-nowrap">
             <div class="flex flex-row gap-4 items-start">

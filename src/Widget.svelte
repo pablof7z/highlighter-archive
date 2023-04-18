@@ -3,15 +3,15 @@
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
     import { onMount } from 'svelte';
     import Container from './Container.svelte';
-    import Highlight from '$lib/components/Highlight.svelte';
     import HighlightInterface from '$lib/interfaces/highlights.js';
     import { highlightText } from '$lib/utils';
     import {nip19} from 'nostr-tools';
 
-    let minimizeChat = true;
-    export let url: string;
+    let minimizeWidget = true;
+    export let url: string | undefined = undefined;
     export let loadHighlights = true;
     export let position = 'top-5 right-5 flex-col';
+    export let explicitAuthorHexpubkey: string | undefined = undefined;
     let replacedHighlights: Record<string, boolean> = {};
     let highlights;
     let _highlights: App.Highlight[] = [];
@@ -32,8 +32,6 @@
             }, 1000);
         }
 
-        // create a trigger at the document level so that every time an element with [data-highlight-id] is clicked, we can
-        // open a popup with a URL with the ID
         document.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
             const highlightId = target.getAttribute('data-highlight-id');
@@ -43,15 +41,15 @@
 
                 if (highlight) {
                     const noteEncode = nip19.noteEncode(highlight.id);
-                    const url = new URL('http://localhost:5173/e/'+noteEncode);
+                    const url = new URL('https://zapworthy.com/e/'+noteEncode);
                     window.open(url.href, '_blank');
                 }
             }
         });
     })
 
-    function toggleChat() {
-        minimizeChat = !minimizeChat;
+    function toggleWidget() {
+        minimizeWidget = !minimizeWidget;
     }
 
     $: {
@@ -74,34 +72,33 @@
     }
 </script>
 
-<div class={`fixed mb-5 flex items-end justify-end font-sans ${position}`} style="z-index: 9999999;">
-    <div class={position.includes('left') ? 'self-start' : 'self-end'}>
+<div class="
+    mx-5 fixed mb-5 flex flex-col items-end justify-end font-sans {position}
+    rounded-full backdrop-brightness-150 backdrop-blur-sm p-2
+    overflow-auto gap-6
+" style="z-index: 9999999;">
+    <div class="{position.includes('left') ? 'self-start' : 'self-end'}">
         <a href="#" class="
-            text-white bg-purple-900 hover:bg-purple-700 w-16 h-16 p-5
+            w-16 h-16 p-0
             rounded-full text-center
             flex flex-row items-center justify-center gap-4
-            text-xl font-black
-        " on:click|preventDefault={toggleChat}>
-            {#if $highlights?.length > 0}
-                {$highlights?.length}
-            {:else}
-                📝
-            {/if}
+            transition-all duration-300
+        " on:click|preventDefault={toggleWidget}>
+            <img src="https://b0e77f76a9f6.ngrok.app/images/logo.png" class="rounded-full" />
         </a>
     </div>
-    <div class="
-        shadow-2xl
-        bg-white/90 backdrop-brightness-150 backdrop-blur-md mb-5 w-96 max-w-screen-sm text-black rounded-3xl p-5
-        overflow-auto
-        flex flex-col justify-end
-        {minimizeChat ? 'hidden' : ''}
-    " style="max-height: 80vh;">
-        <Container {url} />
-    </div>
+    {#if !minimizeWidget}
+        <Container {url} {explicitAuthorHexpubkey} />
+    {/if}
 </div>
 
 <style>
 	@tailwind base;
 	@tailwind components;
 	@tailwind utilities;
+
+    :global(mark[data-highlight-id]) {
+        cursor: pointer;
+    }
+
 </style>

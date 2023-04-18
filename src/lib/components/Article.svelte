@@ -1,5 +1,6 @@
 <div class="
     text-xl sm:p-8 bg-zinc-900 sm:shadow-2xl text-justify text-gray-300 leading-loose
+    overflow-scroll
 ">
     <slot />
 </div>

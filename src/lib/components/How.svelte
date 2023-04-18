@@ -1,7 +1,9 @@
 <div class="text-gray-200 text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6 text-zinc-400">
     There are a few different ways of interacting with Zapworthy.
 
-    <h4 class="text-4xl text-white font-serif font-thin mt-4">Web</h4>
+    <h4 class="text-4xl text-white font-serif font-thin mt-4">
+        Browser Extension
+    </h4>
 
     <p>
         You can install a browser extension to highlight and

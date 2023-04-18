@@ -6,7 +6,7 @@
 	</h1>
 
     <h3 class="font-thin text-xl sm:text-3xl text-zinc-300">
-        <span class="">Purple Text.</span>
-		<span class="">Orange Highlights.</span>
+        <span>Purple Text.</span>
+		<span>Orange Highlights.</span>
     </h3>
 </div>

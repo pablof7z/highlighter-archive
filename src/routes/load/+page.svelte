@@ -5,19 +5,20 @@
 	import RadioButton from '$lib/components/buttons/radio.svelte';
 	import Highlight from '$lib/components/HighlightList.svelte';
     import { page } from '$app/stores';
+    import { fetchArticle } from '$lib/article';
     import ArticleInterface from '$lib/interfaces/article';
     import HighlightInterface from '$lib/interfaces/highlights';
     import NoteInterface from '$lib/interfaces/notes';
     import { onMount } from 'svelte';
     import { Tooltip } from 'flowbite-svelte';
-    import Widget from '../../../Widget.svelte';
-    import MarkdownIt from 'markdown-it';
+    import Widget from '../../Widget.svelte';
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import Article from '$lib/components/Article.svelte';
-    import { getText, getParagraph, getSentence } from 'get-selection-more'
+    import { NDKUser } from '@nostr-dev-kit/ndk';
 
-    const { naddr } = $page.params;
+    let url = $page.url.searchParams.get('url') || '';
+    let author = $page.url.searchParams.get('author') || '';
 
     let mode = 'global';
 
@@ -36,40 +37,51 @@
     // }
 
     let articles;
-    let _articles: App.Article[] = [];
-    let article: App.Article;
-    let content: string = '';
-
+    let article: any;
+    let content: string;
+    let authorHexpubkey: string;
     let highlights;
     let _highlights: App.Highlight[] = [];
 
     let notes;
     let _notes: App.Note[] = [];
     let activeSub: NDKSubscription | undefined;
+    let fetchError: string | undefined;
+
+    async function loadUrl() {
+        articles = ArticleInterface.load({url});
+
+        try {
+            article = await fetchArticle(url);
+        } catch (error: any) {
+            fetchError = error.message;
+        }
+
+        content = article.content;
+    }
 
     onMount(async () => {
-        // hack af
+        loadUrl();
+
         setTimeout(() => {
-            articles = ArticleInterface.load({naddr});
-            highlights = HighlightInterface.load({articleNaddr: naddr});
-            activeSub = HighlightInterface.startStream({articleNaddr: naddr});
-            notes = NoteInterface.load({articleNaddr: naddr});
+            highlights = HighlightInterface.load({url});
+            activeSub = HighlightInterface.startStream({url});
+            notes = NoteInterface.load({pubkeys: ['asas']});
         }, 1000);
     });
 
     $: {
-        _articles = ($articles || []) as App.Article[];
-        if (!article) article = _articles[0];
+        _highlights = ($highlights || []) as App.Highlight[];
+        _notes = ($notes || []) as App.Note[];
 
-        if (article) {
-            _highlights = ($highlights || []) as App.Highlight[];
-            _notes = ($notes || []) as App.Note[];
-        }
-
-        if (article && !content) {
-            const md = new MarkdownIt();
-            md.linkify?.set();
-            content = md.render(article.content);
+        if (author && authorHexpubkey === undefined) {
+            try {
+                if (author.startsWith('npub')) {
+                    authorHexpubkey = (new NDKUser({npub: author})).hexpubkey();
+                } else {
+                    authorHexpubkey = author;
+                }
+            } catch(e) {}
         }
 
         if (_highlights && content) {
@@ -84,29 +96,41 @@
     <div class="sm:w-3/5 text-lg p-8 bg-black shadow-lg text-justify text-slate-700 leading-loose flex flex-col gap-2">
         {#if article}
             <!-- Title -->
-            <h1 class="text-3xl sm:text-5xl font-black font-sans leading-normal">{article.title}</h1>
+            <h1 class="text-3xl sm:text-4xl lg:text-6xl font-thin leading-normal font-serif text-white text-left">{article.title}</h1>
+            {#if article.excerpt}
+                <h2 class="text-xl truncate whitespace-nowrap sm:text-2xl lg:text-3xl font-thin leading-normal text-zinc-400 text-left mb-2">{article.excerpt}</h2>
+            {/if}
+
+            <!-- Author / URL -->
+            {#if authorHexpubkey}
+                <h2 class="flex flex-row items-center text-sm sm:text-sm gap-4">
+                    <div class="flex flex-row gap-4 items-start">
+                        <Avatar pubkey={authorHexpubkey} klass="h-8" />
+                        <div class=" text-gray-500 text-lg">
+                            <Name pubkey={authorHexpubkey} />
+                        </div>
+                    </div>
+                </h2>
+            {:else}
+
+                <button class="text-orange-800 flex flex-row" on:click={() => { author = prompt(`Enter the author's npub`) }}>
+                    Do you know the author's npub?
+                </button>
+            {/if}
 
             <div class="flex flex-row justify-between">
-                <!-- Author / URL -->
-                {#if article?.author}
-                    <h2 class="flex flex-row items-center text-sm sm:text-sm gap-4">
-                        <div class="flex flex-row gap-4 items-start">
-                            <Avatar pubkey={article.author} klass="h-8" />
-                            <div class=" text-gray-500 text-lg">
-                                <Name pubkey={article.author} />
-                            </div>
-                        </div>
-                    </h2>
-                {:else if article?.url}
+                {#if article.byline}
+                    {article.byline}
+                {:else if url}
                     <div class="text-slate-600 text-xs whitespace-nowrap">
-                        {article.url}
+                        {url}
                     </div>
                 {:else}
                     <div></div>
                 {/if}
 
                 <!-- Publisher -->
-                {#if article?.publisher != article?.author}
+                {#if article?.publisher && article?.publisher !== author}
                     <h2 class="flex flex-row items-center text-sm sm:text-sm gap-4">
                         Published by
                         <div class="flex flex-row items-center gap-2">
@@ -133,6 +157,8 @@
                     {@html content}
                 </Article>
             </article>
+        {:else}
+            {fetchError}
         {/if}
     </div>
 
@@ -178,4 +204,4 @@
     </div>
 </div>
 
-<Widget loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" />
+<Widget {url} loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" explicitAuthorHexpubkey={authorHexpubkey} />
