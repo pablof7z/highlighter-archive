@@ -1,5 +1,37 @@
+<script lang="ts">
+    import CopyIcon from '$lib/icons/Copy.svelte';
+    import CheckIcon from '$lib/icons/Check.svelte';
+
+    let copied = false;
+
+    function copyNpub() {
+        navigator.clipboard.writeText('nostr:npub1w0rthyjyp2f5gful0gm2500pwyxfrx93a85289xdz0sd6hyef33sh2cu4x');
+        copied = true;
+        setTimeout(() => {
+            copied = false;
+        }, 2000);
+    }
+</script>
+
 <div class="text-gray-200 text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6 text-zinc-400">
     There are a few different ways of interacting with Zapworthy.
+
+    <h4 class="text-4xl text-white font-serif font-thin mt-4">
+        Web
+    </h4>
+
+    <p>
+        You can use the web interface to load an article and highlight directly
+        from the web.
+    </p>
+
+    <a href="/web" class="
+        font-semibold outline outline-1 outline-orange-500 px-4 py-3 rounded-xl text-lg self-start
+        text-orange-600 hover:text-white
+        hover:bg-orange-600 transition duration-300
+    ">
+        Web Console
+    </a>
 
     <h4 class="text-4xl text-white font-serif font-thin mt-4">
         Browser Extension
@@ -9,6 +41,14 @@
         You can install a browser extension to highlight and
         categorize the zapworthy content you randomly find.
     </p>
+
+    <a href="#" class="
+        font-semibold outline outline-1 outline-orange-500 px-4 py-3 rounded-xl text-lg self-start
+        text-orange-600 hover:text-white
+        hover:bg-orange-600 transition duration-300
+    ">
+        Chrome Extension
+    </a>
 
     <p>
         That extension even enables you to quickly ingest a
@@ -25,6 +65,24 @@
         can use the embedded highlighter in this site. The bot
         will reply with a URL for you to use.
     </p>
+
+    <div class="flex flex-row gap-4">
+        <a href="nostr:npub1w0rthyjyp2f5gful0gm2500pwyxfrx93a85289xdz0sd6hyef33sh2cu4x" class="
+            font-semibold outline outline-1 outline-orange-500 px-4 py-3 rounded-xl text-lg self-start
+            text-orange-600 hover:text-white
+            hover:bg-orange-600 transition duration-300
+        ">
+            @zapworthy
+        </a>
+
+        <button on:click={copyNpub}>
+            {#if copied}
+                <span class="text-green-500 flex flex-row gap-2 text-sm items-center"><CheckIcon /> Copied</span>
+            {:else}
+                <CopyIcon />
+            {/if}
+        </button>
+    </div>
 
     <h4 class="text-4xl text-white font-serif font-thin mt-4">
         NIP-23 long-form content

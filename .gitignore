@@ -3,7 +3,8 @@ node_modules
 /build
 /.svelte-kit
 /package
-/src/**.js
+/src/**/*.js
+/src/**/*.js.map
 .env
 .env.*
 !.env.example

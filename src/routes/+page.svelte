@@ -130,12 +130,12 @@
 
 		<RadioButton bind:group={mode} on:change={setMode} value="about">
 			<AboutIcon />
-			About
+			<span class="hidden sm:block">About</span>
 		</RadioButton>
 
 		<RadioButton bind:group={mode} on:change={setMode} value="how">
 			<HowIcon />
-			How
+			<span class="hidden sm:block">How</span>
 		</RadioButton>
 	</div>
 
