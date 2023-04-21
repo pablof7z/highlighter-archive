@@ -103,8 +103,6 @@
 	let mode = 'global';
 
 	async function setMode() {
-
-		$highlights?.unsubscribe();
 		_highlights = [];
 
 		await stopActiveSub();
