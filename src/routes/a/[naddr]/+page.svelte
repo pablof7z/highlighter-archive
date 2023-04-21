@@ -15,7 +15,9 @@
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import Article from '$lib/components/Article.svelte';
-    import { getText, getParagraph, getSentence } from 'get-selection-more'
+    import type { NDKSubscription } from '@nostr-dev-kit/ndk';
+    import { openModal } from 'svelte-modals'
+    import HighlightIntroModal from '$lib/modals/HighlightIntro.svelte';
 
     const { naddr } = $page.params;
 
@@ -46,15 +48,19 @@
     let notes;
     let _notes: App.Note[] = [];
     let activeSub: NDKSubscription | undefined;
+    let replacedHighlights: Record<string, boolean> = {};
 
     onMount(async () => {
-        // hack af
-        setTimeout(() => {
-            articles = ArticleInterface.load({naddr});
-            highlights = HighlightInterface.load({articleNaddr: naddr});
-            activeSub = HighlightInterface.startStream({articleNaddr: naddr});
-            notes = NoteInterface.load({articleNaddr: naddr});
-        }, 1000);
+        articles = ArticleInterface.load({naddr});
+        highlights = HighlightInterface.load({articleNaddr: naddr});
+        activeSub = HighlightInterface.startStream({articleNaddr: naddr});
+        notes = NoteInterface.load({articleNaddr: naddr});
+
+        // check if the highlightintro modal has been displayed on localStorage
+        if (!localStorage.getItem('highlightIntro')) {
+            openModal(HighlightIntroModal);
+            localStorage.setItem('highlightIntro', 'true');
+        }
     });
 
     $: {
@@ -74,7 +80,10 @@
 
         if (_highlights && content) {
             for (const highlight of _highlights) {
+                if (replacedHighlights[highlight.id!]) continue;
+
                 content = content.replace(highlight.content, `<mark data-highlight-id="${highlight.id}">${highlight.content}</mark>`);
+                replacedHighlights[highlight.id!] = true;
             }
         }
     }

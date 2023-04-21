@@ -5,12 +5,26 @@
     import { Modals, closeModal } from 'svelte-modals'
     import { fade } from 'svelte/transition'
 
-    onMount(async () => {
-        try {
-            $ndk.signer = new NDKNip07Signer();
-        } catch (e) {
-            console.error(e);
+    // move to NDK's nip-07 signer
+    function tryToLoadNip07(delay = 0) {
+        if (delay > 5000) return;
+
+        if (window.nostr) {
+            try {
+                $ndk.signer = new NDKNip07Signer();
+                $ndk = $ndk;
+            } catch (e) {
+                alert('no nip-07')
+                console.error(e);
+            }
+        } else {
+            delay += 100
+            setTimeout(() => tryToLoadNip07(delay), delay);
         }
+    }
+
+    onMount(async () => {
+        tryToLoadNip07();
         await $ndk.connect();
     });
 </script>

@@ -38,7 +38,8 @@
 </script>
 
 <div class="
-    border border-zinc-800 rounded-lg mb-4
+    mt-4
+    border border-zinc-800 rounded-lg
     bg-zinc-900
 ">
     <div class="flex flex-col items-center">

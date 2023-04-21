@@ -9,18 +9,17 @@
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';
     import { onMount } from 'svelte';
-    import Close from '$lib/icons/Close.svelte';
 
-    export let isOpen = true;
     export let highlight: App.Highlight;
     export let article: App.Article;
 
     let amount = '1000';
+    let comment = '';
 
     async function zap() {
         await $ndk.connect();
         let zappedEvent = new NDKEvent($ndk, JSON.parse(highlight.event));
-        let pr = await zappedEvent.zap(highlighterAmount*1000);
+        let pr = await zappedEvent.zap(highlighterAmount*1000, comment);
 
         if (!pr) {
             console.log('no payment request');
@@ -32,11 +31,10 @@
             const res = await webln.sendPayment(pr);
         } catch (err: any) {
             console.log(err);
-            // should we unlock the mutex here if the user rejected the payment?
         }
 
         zappedEvent = new NDKEvent($ndk, JSON.parse(article.event));
-        pr = await zappedEvent.zap(authorAmount*1000);
+        pr = await zappedEvent.zap(authorAmount*1000, comment, [['e', highlight.id]]);
 
         if (!pr) {
             console.log('no payment request');
@@ -79,8 +77,8 @@
             authorAmount = iAmount * 0.9;
             publisherAmount = iAmount * 0.1;
         } else if (showAuthor && showHighlighter) {
-            authorAmount = iAmount * 0.7;
-            highlighterAmount = iAmount * 0.3;
+            authorAmount = iAmount * 0.8;
+            highlighterAmount = iAmount * 0.2;
         } else if (showPublisher && showHighlighter) {
             publisherAmount = iAmount * 0.6;
             highlighterAmount = iAmount * 0.4;
@@ -94,7 +92,6 @@
     }
 </script>
 
-{#if isOpen}
 <div role="dialog" class="modal" transition:fade>
     <div class="
         rounded-xl p-6
@@ -161,6 +158,19 @@
             </div>
         </div>
 
+        <div class="flex flex-col gap-3">
+            <h2 class="text-zinc-500 font-semibold text-base uppercase">
+                COMMENT
+            </h2>
+
+            <input
+                type="text"
+                class="borde-1 border-zinc-600 bg-zinc-800 text-zinc-400 rounded-xl p-4"
+                maxlength="50"
+                placeholder="Add a comment..."
+                bind:value={comment} />
+        </div>
+
         <div class="actions">
             <button class="
                 bg-purple-600 hover:bg-orange-500
@@ -171,10 +181,9 @@
             </button>
         </div>
     </div>
-    </div>
-    {/if}
+</div>
 
-    <style>
+<style>
     .modal {
         position: fixed;
         top: 0;
@@ -187,13 +196,6 @@
 
         /* allow click-through to backdrop */
         pointer-events: none;
-    }
-
-    .contents {
-        min-width: 240px;
-        border-radius: 6px;
-        padding: 16px;
-
     }
 
     .actions {

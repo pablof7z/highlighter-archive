@@ -23,8 +23,14 @@
         }
 
         defaultName = `[${pubkey?.slice(0, 5)}]`;
-        name = userProfile?.displayName || defaultName;
+        name = userProfile?.displayName || userProfile?.name || defaultName;
     }
 </script>
 
-{name}
+{#await observeUserProfile}
+    <span class="text-orange-600">{defaultName}</span>
+{:then _userProfile}
+    {name}
+{:catch error}
+    <div class="text-red-600">{defaultName}</div>
+{/await}

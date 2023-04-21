@@ -27,4 +27,10 @@
     }
 </script>
 
-<img src={image || defaultImage} class={`rounded-full ${klass}`} />
+{#await observeUserProfile}
+    <img src={defaultImage} class={`rounded-full ${klass}`} />
+{:then _userProfile}
+    <img src={image || defaultImage} class={`rounded-full ${klass}`} />
+{:catch error}
+    <span class="rounded-full w-6 h-6 text-red-600">E</span>
+{/await}

@@ -9,7 +9,7 @@ document.body.appendChild(div);
 
 const link = document.createElement('link');
 link.rel = 'stylesheet';
-link.href = 'http://localhost:5173/public/bundle.css';
+link.href = 'https://zapworthy.com/public/bundle.css';
 
 // Append the link element to the head of the page
 document.head.appendChild(link);

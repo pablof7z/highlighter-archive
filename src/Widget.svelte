@@ -61,6 +61,7 @@
                 try {
                     replacedHighlights[highlight.id] = true; // don't retry if it failed
                     highlightText(highlight.content, highlight.id);
+                    replacedHighlights[highlight.id] = true;
                 } catch (e) {
                     console.error(e);
                     continue;

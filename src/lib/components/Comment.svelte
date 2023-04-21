@@ -11,9 +11,11 @@
 
     async function post() {
         const aTag = op.getMatchingTags('a')[0];
+        const pTags = op.getMatchingTags('p')||[];
         const tags = [
             ['p', op.pubkey],
             ['e', op.id],
+            ...pTags
         ]
 
         if (aTag) tags.push(aTag);

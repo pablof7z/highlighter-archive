@@ -20,6 +20,10 @@
     let url = $page.url.searchParams.get('url') || '';
     let author = $page.url.searchParams.get('author') || '';
 
+    if (url.startsWith('https://zapworthy.com/load?url=')) {
+        url = decodeURIComponent(url.replace('https://zapworthy.com/load?url=', '') || '');
+    }
+
     let mode = 'global';
 
     // function setMode() {
@@ -63,11 +67,9 @@
     onMount(async () => {
         loadUrl();
 
-        setTimeout(() => {
-            highlights = HighlightInterface.load({url});
-            activeSub = HighlightInterface.startStream({url});
-            notes = NoteInterface.load({pubkeys: ['asas']});
-        }, 1000);
+        highlights = HighlightInterface.load({url});
+        activeSub = HighlightInterface.startStream({url});
+        notes = NoteInterface.load({pubkeys: ['asas']});
     });
 
     $: {
@@ -157,8 +159,23 @@
                     {@html content}
                 </Article>
             </article>
+        {:else if fetchError}
+            <div class="w-full flex flex-col items-center justify-center">
+                <h4 class="text-4xl text-white font-serif font-thin my-4">Error</h4>
+                {url}
+
+                {fetchError}
+
+                <a href="/" class="
+                    font-semibold outline outline-1 outline-orange-500 px-4 py-3 mt-12 rounded-xl text-lg
+                    text-orange-600 hover:text-white
+                    hover:bg-orange-600 transition duration-300
+                ">
+                    Go back home
+                </a>
+            </div>
         {:else}
-            {fetchError}
+            <p>Loading {url}...</p>
         {/if}
     </div>
 
@@ -180,17 +197,17 @@
                 <RadioButton bind:group={mode} value="my">
                     <MyHighlightsIcon />
                 </RadioButton>
-                <Tooltip placement="bottom">My Highlights</Tooltip>
+                <Tooltip placement="bottom">My Highlights (coming soon)</Tooltip>
 
                 <RadioButton bind:group={mode} value="global">
                     <GlobalIcon />
                 </RadioButton>
-                <Tooltip placement="bottom">Global Highlights Feed</Tooltip>
+                <Tooltip placement="bottom">Global Highlights Feed (coming soon)</Tooltip>
 
                 <RadioButton bind:group={mode} value="network">
                     <FollowsIcon />
                 </RadioButton>
-                <Tooltip placement="bottom">Highlights from people you follow</Tooltip>
+                <Tooltip placement="bottom">Highlights from people you follow (coming soon)</Tooltip>
             </div>
         </div>
 

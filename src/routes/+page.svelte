@@ -5,6 +5,7 @@
     import FollowsIcon from '$lib/icons/Follows.svelte';
     import AboutIcon from '$lib/icons/About.svelte';
     import HowIcon from '$lib/icons/How.svelte';
+    import ConsoleIcon from '$lib/icons/Console.svelte';
 
 	import { Tooltip } from 'flowbite-svelte';
 
@@ -15,54 +16,55 @@
 	import HighlightList from '$lib/components/HighlightList.svelte';
 	import Hero from '$lib/components/Hero.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Console from '$lib/components/Console.svelte';
 	import RadioButton from '$lib/components/buttons/radio.svelte';
 	import About from '$lib/components/About.svelte';
 	import How from '$lib/components/How.svelte';
-	import type { NDKSubscription } from '@nostr-dev-kit/ndk';
+	import type { NDKSubscription, NDKUser } from '@nostr-dev-kit/ndk';
 
 	let highlights;
     let _highlights: App.Highlight[] = [];
-	let activeSubs: NDKSubscription | undefined;
+	let activeSubs: Promise<NDKSubscription | undefined> | undefined;
 
 	onMount(async () => {
 		const urlMode = window.location.hash.replace('#', '');
-		if (urlMode && ['my', 'global', 'network', 'what', 'how'].includes(urlMode)) {
+		if (urlMode && ['global', 'console', 'what', 'how'].includes(urlMode)) {
 			mode = urlMode;
 		}
 
 		setMode();
     });
 
-	onDestroy(() => {
-		if (activeSubs) {
-			activeSubs.stop();
-			activeSubs = undefined;
-		}
+	onDestroy(async () => {
+		await stopActiveSub();
 	});
 
-	let allPubkeys = [];
-	let renderedAt: string;
+	async function stopActiveSub() {
+		const _activeSubs = await activeSubs;
+		if (_activeSubs) {
+			(_activeSubs).stop();
+			activeSubs = undefined;
+		}
+	}
 
 	$: {
-		if ($highlights) {
-			console.log($highlights);
-
-			allPubkeys = Array.from(new Set(($highlights||[]).map((h: App.Highlight) => h.pubkey)));
-		}
-
 		_highlights = (($highlights || []) as App.Highlight[]).sort((a, b) => {
 			return b.timestamp - a.timestamp;
 		});
 
 		_highlights = _highlights;
-		renderedAt = (new Date()).toLocaleString();
 	}
 
 	let currentUser: string;
+	let followList: Set<NDKUser> | undefined;
 
 	async function myHighlights(): Promise<NDKSubscription | undefined> {
 		const user = await $ndk.signer?.user();
-		if (!user) return;
+		if (!user) {
+			alert("you don't seem to have a NIP-07 nostr extension")
+			mode = 'global';
+			return;
+		}
 
 		currentUser = user.npub;
 
@@ -71,46 +73,75 @@
 		return HighlightInterface.startStream(opts);
 	}
 
-	function globalHighlights() {
+	async function networkHighlights(): Promise<NDKSubscription | undefined> {
+		const user = await $ndk.signer?.user();
+		if (!user) {
+			alert("you don't seem to have a NIP-07 nostr extension")
+			mode = 'global';
+			return;
+		}
+		user.ndk = $ndk;
+
+		currentUser = user.npub;
+
+		if (!followList) {
+			followList = await user.follows();
+		}
+
+		const followPubkeys = Array.from(followList).map((u) => u.hexpubkey());
+
+		const opts = { pubkeys: followPubkeys };
+		highlights = HighlightInterface.load(opts);
+		return HighlightInterface.startStream(opts);
+	}
+
+	async function globalHighlights() {
 		highlights = HighlightInterface.load();
 		return HighlightInterface.startStream();
 	}
 
-	let mode = 'what';
+	let mode = 'global';
 
 	async function setMode() {
-		highlights = null;
+
+		$highlights?.unsubscribe();
 		_highlights = [];
 
-		if (activeSubs) {
-			activeSubs.stop();
-			activeSubs = undefined;
-		}
+		await stopActiveSub();
 
-		switch (mode) {
-			case 'my':
-				activeSubs = await myHighlights();
-				break;
-			case 'global':
-				activeSubs = globalHighlights();
-				break;
-			case 'network':
-				break;
-		}
+		setTimeout(() => {
+			switch (mode) {
+				case 'my':
+					activeSubs = myHighlights();
+					break;
+				case 'network':
+					activeSubs = networkHighlights();
+					break;
+				case 'global':
+					activeSubs = globalHighlights();
+					break;
+			}
+		}, 2000);
 
-		window.location.hash = mode === 'global' ? '' : mode;
+		window.location.hash = mode === 'what' ? '' : mode;
 	}
 </script>
+
+<svelte:head>
+	<title>Zapworthy</title>
+	<meta name="description" content="Unleash valuable words from their artificial silos" />
+</svelte:head>
 
 <Hero />
 
 <main class="max-w-2xl mx-auto pb-32">
 	<div class="
-		flex flex-row text-slate-300 items-center justify-center mb-4 sm:mb-16 gap-4
+		flex flex-row text-slate-300 items-center justify-center mb-4 sm:mb-12 sm:gap-4
+		whitespace-nowrap
 	">
 		<RadioButton bind:group={mode} on:change={setMode} value="my">
 			<MyHighlightsIcon />
-			<span class="hidden sm:block">My Highlights</span>
+			<span class="hidden sm:block">Personal</span>
 		</RadioButton>
 		<Tooltip>Your personal highlights</Tooltip>
 
@@ -122,13 +153,19 @@
 
 		<RadioButton bind:group={mode} on:change={setMode} value="global">
 			<GlobalIcon />
-			<span class="hidden sm:block">Atlas</span>
+			<span class="hidden sm:block">Global</span>
 		</RadioButton>
 		<Tooltip>Global Feed</Tooltip>
 
+		<RadioButton bind:group={mode} on:change={setMode} value="console">
+			<ConsoleIcon />
+			<span class="hidden sm:block">Console</span>
+		</RadioButton>
+		<Tooltip>Console</Tooltip>
+
 		<RadioButton bind:group={mode} on:change={setMode} value="what">
 			<AboutIcon />
-			<span class="hidden sm:block">What</span>
+			<span class="hidden sm:block">What is this?</span>
 		</RadioButton>
 
 		<RadioButton bind:group={mode} on:change={setMode} value="how">
@@ -141,17 +178,14 @@
 		<About />
 	{:else if mode === 'how'}
 		<How />
-	{:else if mode === 'my' || mode === 'global'}
+	{:else if mode === 'console'}
+		<Console />
+	{:else if mode === 'my' || mode === 'global' || mode === 'network'}
 		<div class="grid grid-cols-1 gap-8">
 			{#each _highlights as highlight}
-				<HighlightList {highlight} />
+				<HighlightList {highlight} disableClick={true} />
+				<span class="text-white">{highlight.pubkey}</span>
 			{/each}
-		</div>
-	{:else if mode === 'network'}
-		<div class="text-center text-slate-300 flex flex-col items-center">
-			<div class="text-2xl my-4">
-				Coming soon™️
-			</div>
 		</div>
 	{/if}
 </main>

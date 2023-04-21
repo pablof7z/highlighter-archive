@@ -33,7 +33,7 @@
 	"dependencies": {
 		"@mozilla/readability": "^0.4.4",
 		"@nostr-connect/connect": "^0.2.3",
-		"@nostr-dev-kit/ndk": "^0.1.2",
+		"@nostr-dev-kit/ndk": "^0.1.6",
 		"@popperjs/core": "^2.11.7",
 		"@rollup/plugin-commonjs": "^24.0.1",
 		"@rollup/plugin-json": "^6.0.0",

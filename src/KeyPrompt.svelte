@@ -11,19 +11,22 @@
     let type = 'nip07'; //localStorage.getItem('nostrichat-type');
 
     onMount(() => {
-        if (type === 'nip07') {
-            useNip07();
-        } else if (type === 'nip-46') {
-            useNip46();
-        }
+        setTimeout(() => {
+            if (type === 'nip07') {
+                useNip07();
+            } else if (type === 'nip-46') {
+                useNip46();
+            }
+        }, 500);
     });
 
-    function useNip07() {
+    async function useNip07() {
         try {
             $ndk.signer = new NDKNip07Signer();
-            $ndk.signer.user();
+            await $ndk.signer.user();
         } catch (e) {
             hasNostrNip07 = false;
+            alert("You don't seem to have a NIP-07 nostr extension; we can't do highlights without it yet")
             console.error(e);
         }
     }
@@ -86,97 +89,7 @@
 
         nip46URI = connectURI.toString();
     }
-
-    function Nip46Copy() {
-        navigator.clipboard.writeText(nip46URI);
-    }
 </script>
-
-<h1 class="font-bold text-xl mb-3">
-    How would you like to connect?
-</h1>
-
-{#if publicKey}
-    <p class="text-gray-400 mb-3 font-bold">
-        Nostr Connect is a WIP, not fully implemented yet!
-    </p>
-
-    <p class="text-gray-400 mb-3">
-        You are currently connected with the following public key:
-        <span>{publicKey}</span>
-    </p>
-{/if}
-
-{#if nip46URI}
-    <p class="text-gray-600 mb-3">
-        Scan this with your Nostr Connect (click to copy to clipboard)
-    </p>
-
-    <!-- <div class="bg-white w-full p-3"
-        on:click|preventDefault={Nip46Copy}>
-        <QR text={nip46URI} />
-    </div> -->
-
-    <button class="
-        bg-purple-900
-        hover:bg-purple-700
-        w-full
-        p-2
-        rounded-xl
-        text-center
-        font-regular
-        text-white
-    " on:click|preventDefault={() => { nip46URI = null; }}>
-        Cancel
-    </button>
-{:else if !publicKey}
-    <div class="flex flex-col gap-1">
-        {#if hasNostrNip07}
-            <button class="
-                bg-purple-900
-                hover:bg-purple-700
-                w-full
-                p-4
-                rounded-xl
-                text-center
-                font-regular
-                text-gray-200
-            " on:click|preventDefault={useNip07}>
-                Browser Extension (NIP-07)
-            </button>
-        {/if}
-
-
-        <button class="
-            bg-purple-900
-            hover:bg-purple-700
-            w-full
-            p-4
-            rounded-xl
-            text-center
-            font-regular
-            text-gray-200
-        " on:click|preventDefault={useNip46}>
-            Nostr Connect (NIP-46)
-        </button>
-
-        <button class="
-            bg-purple-900
-            hover:bg-purple-700
-            w-full
-            p-4
-            rounded-xl
-            text-center
-            font-regular
-            text-gray-200
-        " on:click|preventDefault={useDiscardableKeys}>
-            Anonymous
-            <span class="text-xs text-gray-300">
-                (Ephemeral Keys)
-            </span>
-        </button>
-    </div>
-{/if}
 
 <style>
 	@tailwind base;

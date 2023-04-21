@@ -1,6 +1,7 @@
 <script lang="ts">
     import CopyIcon from '$lib/icons/Copy.svelte';
     import CheckIcon from '$lib/icons/Check.svelte';
+  import { goto } from '$app/navigation';
 
     let copied = false;
 
@@ -42,17 +43,26 @@
         categorize the zapworthy content you randomly find.
     </p>
 
-    <a href="#" class="
-        font-semibold outline outline-1 outline-orange-500 px-4 py-3 rounded-xl text-lg self-start
-        text-orange-600 hover:text-white
-        hover:bg-orange-600 transition duration-300
-    ">
-        Chrome Extension
-    </a>
+    <div class="flex flex-col md:flex-row gap-4 items-center">
+        <a href="https://github.com/pablof7z/zapworthy-extension" class="
+            font-semibold outline outline-1 outline-orange-500 px-4 py-3 rounded-xl text-lg self-start
+            text-orange-600 hover:text-white
+            hover:bg-orange-600 transition duration-300
+            sm:whitespace-nowrap
+        ">
+            Chrome Extension
+        </a>
+
+        <p class="text-sm text-zinc-600">
+            Google is rejecting my extension from their store; for now you'll need to build it manually.
+            <br>
+            The glory of permissioned-systems.
+        </p>
+    </div>
 
     <p>
         That extension even enables you to quickly ingest a
-        worthy essay right as a Nostr long-form post.
+        worthy essay into a Nostr long-form post.
     </p>
 
     <h4 class="text-4xl text-white font-serif font-thin mt-4">
@@ -89,7 +99,7 @@
     </h4>
 
     <p>
-        Obviously, nostr tools prefer nostr content, yes, we
+        Obviously, Nostr apps prefer Nostr content; yes, we
         are showing our bias here, but interoperable content
         is just better that way.
     </p>

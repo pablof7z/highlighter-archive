@@ -16,7 +16,13 @@ interface ILoadOpts {
     pubkeys?: string[];
     articleNaddr?: string;
     url?: string;
+    ids?: string[];
 };
+
+// until I add delete support
+const blacklistIds = [
+    'd7ecc7d8dd63ba0dbbcfcc209fc2d95359e516f39bcc783aabb466d8643ab960', // accidental highlight
+];
 
 const HighlightInterface = {
     fromIds: (ids: string[]) => {
@@ -31,6 +37,7 @@ const HighlightInterface = {
         const filter: NDKFilter = { kinds: [9802] };
 
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
+        if (opts.ids) filter['ids'] = opts.ids;
         if (opts.articleNaddr) {
             const ndecode = nip19.decode(opts.articleNaddr).data as any;
             articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
@@ -41,6 +48,8 @@ const HighlightInterface = {
         const subs = ndk.subscribe(filter, { closeOnEose: false });
 
         subs.on('event', async (event: NDKEvent) => {
+            if (blacklistIds.includes(event.id)) return;
+
             const url = valueFromTag(event, 'r');
 
             if (!url) return;
@@ -69,6 +78,8 @@ const HighlightInterface = {
 
     load: (opts: ILoadOpts = {}) => {
         if (opts.pubkeys) {
+            console.log('loading highlights for pubkeys', opts.pubkeys);
+
             return liveQuery(() =>
                 db.highlights.where('pubkey').anyOf(opts.pubkeys as string[]).toArray()
             );
