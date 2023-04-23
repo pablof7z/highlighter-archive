@@ -1,7 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 
 const config = {
-	plugins: [sveltekit()]
+	plugins: [sveltekit()],
+	optimizeDeps: {
+		exclude: ['bytemd']
+	}
 };
 
 export default config;

@@ -36,7 +36,7 @@
 </script>
 
 <svelte:head>
-	<title>Zapworthy</title>
+	<title>HIGHLIGHTER.com</title>
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
 

@@ -13,9 +13,11 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
 }
 
 interface ILoadOpts {
+    ids?: string[];
     pubkeys?: string[];
     articleNaddr?: string;
     replies?: string[];
+    limit?: number;
 };
 
 const NoteInterface = {
@@ -31,10 +33,13 @@ const NoteInterface = {
         );
     },
 
-    load: (opts: ILoadOpts = {}) => {
+    startStream: (opts: ILoadOpts = {}) => {
         const filter: NDKFilter = { kinds: [1] };
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.replies) filter['#e'] = opts.replies;
+        if (opts.ids) filter['ids'] = opts.ids;
+
+        if (opts.limit) filter['limit'] = opts.limit;
 
         let articleReference: string | undefined;
 
@@ -50,6 +55,8 @@ const NoteInterface = {
 
         subs.on('event', async (event: NDKEvent) => {
             try {
+                console.log(`add note from ${event.pubkey}`);
+
                 const articleId = valueFromTag(event, 'a');
                 const eventId = valueFromTag(event, 'e');
 
@@ -59,7 +66,8 @@ const NoteInterface = {
                     content: event.content,
                     replyToArticleId: articleId,
                     replyToEventId: eventId,
-                    event: JSON.stringify(await event.toNostrEvent())
+                    event: JSON.stringify(event.rawEvent()),
+                    createdAt: event.created_at!
                 };
 
                 await db.notes.put(note);
@@ -67,12 +75,35 @@ const NoteInterface = {
                 console.error(e);
             }
         });
+    },
+
+    load: (opts: ILoadOpts = {}) => {
+        // if querying by ids, check if we have them in the database already
+        if (opts.ids) {
+            db.notes.where('id').anyOf(opts.ids).toArray().then((notes) => {
+                if (notes.length === opts.ids!.length) {
+                    console.log('notes from cache', notes.length);
+                } else {
+                    console.log('notes from cache', notes.length, 'need to fetch', opts.ids!.length - notes.length);
+                    NoteInterface.startStream(opts);
+                }
+            });
+        } else {
+            NoteInterface.startStream(opts);
+        }
 
         if (opts.pubkeys) {
             return liveQuery(() =>
-                db.notes.where('pubkey').anyOf(opts.pubkeys as string[]).toArray()
+                db.notes
+                    .where('pubkey').anyOf(opts.pubkeys as string[])
+                    .limit(opts.limit || 1000)
+                    .reverse()
+                    .sortBy('createdAt')
             );
-        } else if (articleReference) {
+        } else if (opts.articleNaddr) {
+            const ndecode = nip19.decode(opts.articleNaddr).data as any;
+            let articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
+
             return liveQuery(() =>
                 db.notes.where({replyToArticleId: articleReference}).toArray()
             );
@@ -80,8 +111,12 @@ const NoteInterface = {
             return liveQuery(() =>
                 db.notes.where('replyToEventId').anyOf(opts.replies!).toArray()
             );
+        } else if (opts.ids) {
+            return liveQuery(() =>
+                db.notes.where('id').anyOf(opts.ids!).toArray()
+            );
         } else {
-            return liveQuery(() => (db.notes.toArray()));
+            // return liveQuery(() => (db.notes.toArray()));
         }
     }
 };

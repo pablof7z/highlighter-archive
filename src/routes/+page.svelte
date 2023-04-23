@@ -24,7 +24,7 @@
 
 	let highlights;
     let _highlights: App.Highlight[] = [];
-	let activeSubs: Promise<NDKSubscription | undefined> | undefined;
+	let activeSubs: Promise<NDKSubscription[] | undefined> | undefined;
 
 	onMount(async () => {
 		const urlMode = window.location.hash.replace('#', '');
@@ -42,7 +42,7 @@
 	async function stopActiveSub() {
 		const _activeSubs = await activeSubs;
 		if (_activeSubs) {
-			(_activeSubs).stop();
+			for (const a of _activeSubs) a.stop();
 			activeSubs = undefined;
 		}
 	}
@@ -55,10 +55,10 @@
 		_highlights = _highlights;
 	}
 
-	let currentUser: string;
+	let currentNpub: string;
 	let followList: Set<NDKUser> | undefined;
 
-	async function myHighlights(): Promise<NDKSubscription | undefined> {
+	async function myHighlights(): Promise<NDKSubscription[] | undefined> {
 		const user = await $ndk.signer?.user();
 		if (!user) {
 			alert("you don't seem to have a NIP-07 nostr extension")
@@ -66,14 +66,14 @@
 			return;
 		}
 
-		currentUser = user.npub;
+		currentNpub = user.npub;
 
 		const opts = { pubkeys: [user.hexpubkey()] };
 		highlights = HighlightInterface.load(opts);
 		return HighlightInterface.startStream(opts);
 	}
 
-	async function networkHighlights(): Promise<NDKSubscription | undefined> {
+	async function networkHighlights(): Promise<NDKSubscription[] | undefined> {
 		const user = await $ndk.signer?.user();
 		if (!user) {
 			alert("you don't seem to have a NIP-07 nostr extension")
@@ -82,7 +82,7 @@
 		}
 		user.ndk = $ndk;
 
-		currentUser = user.npub;
+		currentNpub = user.npub;
 
 		if (!followList) {
 			followList = await user.follows();
@@ -126,7 +126,7 @@
 </script>
 
 <svelte:head>
-	<title>Zapworthy</title>
+	<title>HIGHLIGHTER.com</title>
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
 
@@ -182,7 +182,6 @@
 		<div class="grid grid-cols-1 gap-8">
 			{#each _highlights as highlight}
 				<HighlightList {highlight} disableClick={true} />
-				<span class="text-white">{highlight.pubkey}</span>
 			{/each}
 		</div>
 	{/if}

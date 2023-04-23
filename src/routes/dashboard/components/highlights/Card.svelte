@@ -9,7 +9,7 @@
     import ViewIcon from '$lib/icons/View.svelte';
     import ZapIcon from '$lib/icons/Zap.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
-    // import BookmarkIcon from '$lib/icons/Bookmark.svelte';
+    import BookmarkIcon from '$lib/icons/Bookmark.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
 
     import { openModal } from 'svelte-modals'
@@ -22,7 +22,10 @@
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';
     import Note from '$lib/components/Note.svelte';
+
     import ZapModal from '$lib/modals/Zap.svelte';
+    import BookmarkModal from '$lib/modals/Bookmark.svelte';
+
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
 
     export let highlight: App.Highlight;
@@ -94,9 +97,6 @@
                 console.error('no article found for this highlight');
             }
         }
-
-        // tag the kind so we can find it later
-        tags.push(['k', highlightEvent.kind?.toString()]);
 
         const boostEvent = new NDKEvent($ndk, {
             content: JSON.stringify(highlightEvent.rawEvent()),
@@ -191,34 +191,42 @@
         domain = new URL(highlight.url).hostname;
     }
 
+    function dragStart(event: DragEvent) {
+        if (!event.dataTransfer) return;
+
+        const e = new NDKEvent($ndk, JSON.parse(highlight.event));
+        const tag = e.tagReference();
+
+        event.dataTransfer.setData('id', highlight.id as string);
+        event.dataTransfer.setData('tag', JSON.stringify(tag));
+    }
 </script>
 
-<div class="flex flex-col">
+<div
+    class="flex flex-col h-full"
+    draggable={true}
+    on:dragstart={dragStart}
+>
     <div class="
+        shadow
         flex flex-col h-full gap-4
-        border border-gray-950 hover:border-gray-900
+        border border-zinc-200 hover:border-zinc-200
         px-6 pt-6 pb-4 rounded-xl
-        bg-gray-1100 hover:bg-gray-950
-        transition duration-100
+        bg-white hover:bg-slate-50 transition duration-200 ease-in-out
     " style="max-height: 40rem;">
 
         {#if !skipTitle}
             <!-- Title -->
             <div class="flex flex-row justify-between items-start">
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col">
                     <a href={articleLink} class="
-                        text-gray-600
-                        font-semibold text-2xl
-                        font-serif
+                        text-lg font-semibold text-zinc-900 hover:text-zinc-600
                     ">
                         {article?.title||domain||'Untitled'}
                     </a>
                     {#if article?.author}
-                        <div class="flex flex-row gap-4 items-start">
-                            <Avatar pubkey={article.author} klass="h-8" />
-                            <div class=" text-gray-500 text-lg">
-                                <Name pubkey={article.author} />
-                            </div>
+                        <div class="flex flex-row gap-4 items-start text-sm text-zinc-400">
+                            <Name pubkey={article.author} klass="h-8" />
                         </div>
                     {:else if article?.url}
                         <div class="text-slate-600 text-xs">
@@ -227,7 +235,7 @@
                     {/if}
                 </div>
 
-                <button class="text-gray-700 hover:text-gray-400 transition duration-300 w-fit"
+                <button class="text-gray-200 hover:text-gray-400 transition duration-300 w-fit"
                     on:click={() => {
                         navigator.clipboard.writeText(highlight.event);
                     }}
@@ -240,10 +248,11 @@
 
         <!-- Content -->
         <a href={articleLink} on:click={onContentClick} class="
-            text-lg leading-relaxed text-gray-200 h-full flex flex-col sm:text-justify
+            leading-relaxed
+            h-full flex flex-col sm:text-justify
+            text-black
             px-6 py-4
             my-2
-            border-l border-slate-500
             overflow-auto
         ">
             {highlight.content}
@@ -262,9 +271,6 @@
             <div class="flex flex-row gap-4 items-center whitespace-nowrap">
                 <div class="flex flex-row gap-4 items-center justify-center">
                     <Avatar pubkey={highlight.pubkey} klass="h-6" />
-                    <div class=" text-gray-500 text-xs hidden sm:block">
-                        <Name pubkey={highlight.pubkey} />
-                    </div>
                 </div>
                 {#if ($replies||[]).length > 0}
                     <button class="text-sm text-gray-500"
@@ -281,6 +287,12 @@
             </div>
 
             <div class="flex flex-row gap-4 items-center">
+                <button
+                    class="text-slate-500 hover:text-purple-700"
+                    on:click={() => { openModal(BookmarkModal, { event: highlight.event }) }}
+                ><BookmarkIcon /></button>
+                <Tooltip>Bookmark</Tooltip>
+
                 <button class="
                     text-slate-500 hover:text-orange-500
                     flex flex-row items-center gap-2

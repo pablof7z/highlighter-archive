@@ -16,7 +16,7 @@
 </script>
 
 <div class="text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6 text-zinc-400">
-    <p>Zapworthy is a feed of a new kind of Nostr event:</p>
+    <p>Highlighter is a feed of a new kind of Nostr event:</p>
 
     <p class="text-white font-semibold"><mark class="bg-orange-700 text-white rounded px-2 py-1">Highlights</mark></p>
 
@@ -43,7 +43,7 @@
     </h4>
 
     <p>
-        I started working on Zapworthy basically immediately after reading
+        I started working on Highlighter basically immediately after reading
         <span class="text-orange-500">@dergigi</span>'s excellent
         <em><a href="/a/naddr1qqxnzd3cxqmrzv3exgmr2wfeqy08wumn8ghj7mn0wd68yttsw43zuam9d3kx7unyv4ezumn9wshszyrhwden5te0dehhxarj9ekk7mf0qy88wumn8ghj7mn0wvhxcmmv9uq3zamnwvaz7tmwdaehgu3wwa5kuef0qy2hwumn8ghj7un9d3shjtnwdaehgu3wvfnj7q3qdergggklka99wwrs92yz8wdjs952h2ux2ha2ed598ngwu9w7a6fsxpqqqp65wy2vhhv" class="text-orange-500">Purple Text. Orange Highlights</a></em>,
         and was fascinated by the idea of using Nostr to create a new

@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import NDK, {NDKEvent} from '@nostr-dev-kit/ndk';
+import NDK, {NDKEvent, NDKUser} from '@nostr-dev-kit/ndk';
 import type { NDKCacheAdapter, NDKFilter, NDKSubscription, NDKUserProfile } from '@nostr-dev-kit/ndk';
 import { db } from '$lib/interfaces/db';
 
@@ -27,6 +27,8 @@ export default class DexieAdapter implements NDKCacheAdapter {
     readonly locking = true;
 
     public async query(subscription: NDKSubscription): Promise<void> {
+        console.log('query', subscription.filter);
+
         // if filter's kinds is exactly [0] then we're looking for a user profile
         if (subscription.filter?.kinds?.length === 1 && subscription.filter.kinds[0] === 0) {
             for (const pubkey of (subscription.filter?.authors||[])) {
@@ -83,6 +85,8 @@ export const ndk = writable(new NDK({
     ],
     cacheAdapter: dexieCacheAdaper,
 }));
+
+export const currentUser = writable<NDKUser | null>(null);
 
 let zapEvent: any;
 

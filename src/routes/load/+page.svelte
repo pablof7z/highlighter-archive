@@ -187,7 +187,7 @@
                     text-zinc-400 hover:text-white
                     font-semibold
                 " name="highlights">
-                    ⚡️ <span class="font-black">ZAP</span>WORTHY
+                    ⚡️ <span class="font-black">HIGH</span>LIGHTER
                 </a>
             </div>
 

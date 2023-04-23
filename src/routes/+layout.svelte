@@ -1,17 +1,20 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import { ndk, currentUser } from '$lib/store';
     import { onMount } from 'svelte';
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
     import { Modals, closeModal } from 'svelte-modals'
     import { fade } from 'svelte/transition'
 
     // move to NDK's nip-07 signer
-    function tryToLoadNip07(delay = 0) {
+    async function tryToLoadNip07(delay = 0) {
         if (delay > 5000) return;
 
         if (window.nostr) {
             try {
                 $ndk.signer = new NDKNip07Signer();
+                $currentUser = await $ndk.signer.user();
+                console.log('currentUser', $currentUser);
+
                 $ndk = $ndk;
             } catch (e) {
                 alert('no nip-07')

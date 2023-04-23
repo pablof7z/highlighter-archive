@@ -38,11 +38,11 @@
 </script>
 
 <div class="
-    mt-4
     border border-zinc-800 rounded-lg
     bg-zinc-900
+    h-full
 ">
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center h-full">
         <div class="flex flex-row gap-4 w-full px-4 pt-4 items-center">
             <Avatar pubkey={note.pubkey} klass="h-8" />
 
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="text-normal text-zinc-300 p-4 w-full">
+        <div class="text-normal text-zinc-300 p-4 w-full flex-grow">
             {note.content}
         </div>
 

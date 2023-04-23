@@ -7,11 +7,16 @@
     import Note from '$lib/components/Note.svelte';
     import NoteInterface from '$lib/interfaces/notes';
     import ArticleInterface from '$lib/interfaces/article';
+
     import BoostIcon from '$lib/icons/Boost.svelte';
     import ZapIcon from '$lib/icons/Zap.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
-    import { onMount } from 'svelte';
+    import BookmarkIcon from '$lib/icons/Bookmark.svelte';
+
     import ZapModal from '$lib/modals/Zap.svelte';
+    import BookmarkModal from '$lib/modals/Bookmark.svelte';
+
+    import { onMount } from 'svelte';
     import { Tooltip } from 'flowbite-svelte';
     import { openModal } from 'svelte-modals'
 
@@ -101,6 +106,12 @@
             </div>
 
             <div class="flex flex-row gap-4 items-center">
+                <button
+                    class="text-slate-500 hover:text-purple-700"
+                    on:click={() => { openModal(BookmarkModal, { highlight, article }) }}
+                ><BookmarkIcon /></button>
+                <Tooltip>Bookmark</Tooltip>
+
                 <button
                     class="text-slate-500 hover:text-purple-700"
                     on:click={() => { openModal(ZapModal, { highlight, article }) }}

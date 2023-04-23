@@ -14,6 +14,7 @@ declare global {
             id?: string;
             url: string;
             pubkey: string;
+            boostedBy?: string;
             content: string;
             articleId?: string;
             event: string;
@@ -26,6 +27,25 @@ declare global {
             content: string;
             replyToArticleId?: string;
             replyToEventId?: string;
+            event: string;
+            createdAt: number;
+        }
+
+        interface BookmarkList {
+            id: string;
+            pubkey: string;
+            title: string;
+            description: string;
+            naddr: string;
+            createdAt: number;
+            event: string;
+        }
+
+        interface EncryptedNote {
+            id: string;
+            pubkey: string;
+            encryptedContent: string;
+            isAtlasMessage: boolean;
             event: string;
         }
 

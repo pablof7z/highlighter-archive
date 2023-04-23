@@ -4,8 +4,7 @@
 		flex flex-row py-2 sm:pt-8 sm:pb-4 gap-1
 		text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-red-700
 	">
-		ZAP
-		Worthy
+		HIGHLIGHTER
 
 	</a>
 

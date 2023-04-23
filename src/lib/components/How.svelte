@@ -15,7 +15,7 @@
 </script>
 
 <div class="text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6 text-zinc-400">
-    There are a few different ways of interacting with Zapworthy.
+    There are a few different ways of interacting with Highlighter.
 
     <h4 class="text-4xl text-white font-serif font-thin mt-4">
         Web
@@ -40,7 +40,7 @@
 
     <p>
         You can install a browser extension to highlight and
-        categorize the zapworthy content you randomly find.
+        categorize the Highlighter content you randomly find.
     </p>
 
     <div class="flex flex-col md:flex-row gap-4 items-center">

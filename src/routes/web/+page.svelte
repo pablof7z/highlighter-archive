@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>Zapworthy Console</title>
+	<title>Highlighter Console</title>
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
 
