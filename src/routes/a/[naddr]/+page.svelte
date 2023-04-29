@@ -3,7 +3,7 @@
     import GlobalIcon from '$lib/icons/Global.svelte';
     import FollowsIcon from '$lib/icons/Follows.svelte';
 	import RadioButton from '$lib/components/buttons/radio.svelte';
-	import Highlight from '$lib/components/HighlightList.svelte';
+	import Highlight from '$lib/components/HighlightListItem.svelte';
     import { page } from '$app/stores';
     import ArticleInterface from '$lib/interfaces/article';
     import HighlightInterface from '$lib/interfaces/highlights';

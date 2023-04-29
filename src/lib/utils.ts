@@ -1,8 +1,24 @@
+
+import sanitizeHtml from 'sanitize-html';
+import MarkdownIt from 'markdown-it';
+
 export function prettifyContent(content: string) {
     const bitcoinImage = "<img src=\"https://abs.twimg.com/hashflags/Bitcoin_evergreen/Bitcoin_evergreen.png\" style=\"width: 1.2em; vertical-align: -20%; margin-right: 0.075em; height: 1.2em; margin-left: 2px; display: inline-block;\">";
 
-    return content
+    content = content
         .replace(/#bitcoin/i, `#bitcoin${bitcoinImage}`);
+
+    const md = new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true,
+        autolink: true,
+        image: true
+    });
+    md.linkify?.set();
+    content = md.render(content);
+
+    return sanitizeHtml(content);
 }
 
 function flattenText(node: string) {

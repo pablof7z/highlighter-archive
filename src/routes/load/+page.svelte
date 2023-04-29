@@ -3,7 +3,7 @@
     import GlobalIcon from '$lib/icons/Global.svelte';
     import FollowsIcon from '$lib/icons/Follows.svelte';
 	import RadioButton from '$lib/components/buttons/radio.svelte';
-	import Highlight from '$lib/components/HighlightList.svelte';
+	import Highlight from '$lib/components/HighlightListItem.svelte';
     import { page } from '$app/stores';
     import { fetchArticle } from '$lib/article';
     import ArticleInterface from '$lib/interfaces/article';
@@ -20,8 +20,8 @@
     let url = $page.url.searchParams.get('url') || '';
     let author = $page.url.searchParams.get('author') || '';
 
-    if (url.startsWith('https://zapworthy.com/load?url=')) {
-        url = decodeURIComponent(url.replace('https://zapworthy.com/load?url=', '') || '');
+    if (url.startsWith('https://highlighter.com/load?url=')) {
+        url = decodeURIComponent(url.replace('https://highlighter.com/load?url=', '') || '');
     }
 
     let mode = 'global';

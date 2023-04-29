@@ -27,8 +27,6 @@ export default class DexieAdapter implements NDKCacheAdapter {
     readonly locking = true;
 
     public async query(subscription: NDKSubscription): Promise<void> {
-        console.log('query', subscription.filter);
-
         // if filter's kinds is exactly [0] then we're looking for a user profile
         if (subscription.filter?.kinds?.length === 1 && subscription.filter.kinds[0] === 0) {
             for (const pubkey of (subscription.filter?.authors||[])) {
@@ -75,6 +73,7 @@ const dexieCacheAdaper = new DexieAdapter();
 export const ndk = writable(new NDK({
     explicitRelayUrls: [
         'wss://purplepag.es',
+        // 'ws://localhost:8080',
         'wss://nos.lol',
         'wss://relay.f7z.io',
         'wss://relay.damus.io',

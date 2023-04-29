@@ -44,13 +44,15 @@
 
         const newListEvent = new NDKEvent($ndk, {
             kind: 30000,
-            content: description || '',
             tags: [
                 ['d', name ],
             ],
         } as NostrEvent);
+        if (description) {
+            newListEvent.tags.push(['d', description]);
+        }
         await newListEvent.publish();
-        goto(`/dashboard/bookmarks/${newListEvent.encode()}`);
+        goto(`/atlas/bookmarks/${newListEvent.encode()}`);
         closeModal();
     }
 </script>

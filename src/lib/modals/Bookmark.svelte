@@ -1,19 +1,15 @@
 <script lang="ts">
     import { ndk } from '$lib/store';
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
-    import UserCard from '$lib/components/UserCard.svelte';
-    import PillButton from '$lib/components/buttons/pill.svelte';
     import CloseIcon from '$lib/icons/Close.svelte';
-    import { NDKEvent, zapInvoiceFromEvent } from '@nostr-dev-kit/ndk';
-    import { requestProvider } from 'webln';
+    import { NDKEvent } from '@nostr-dev-kit/ndk';
 
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';
     import { onMount } from 'svelte';
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
 
-    export let event: NostrEvent;
-    let _event: NDKEvent;
+    export let event: NDKEvent;
 
     let currentNpub;
     let bookmarkLists, _bookmarkLists: App.BookmarkList[] = [];
@@ -38,7 +34,6 @@
 
     onMount(async () => {
         loadbookmarkLists();
-        _event = new NDKEvent($ndk, JSON.parse(event));
     })
 
     $: {
@@ -53,7 +48,7 @@
         const event = new NDKEvent($ndk, JSON.parse(list.event));
 
         // check if event is already in list
-        const [a,b] = _event.tagReference();
+        const [a,b] = event.tagReference();
         if (event.tags.find((tag) => tag[0] === a && tag[1] === b)) {
             event.tags.filter((tag) => tag[0] !== a && tag[1] !== b);
             await event.publish();
@@ -61,7 +56,7 @@
             return;
         }
 
-        event.tags.push(_event.tagReference());
+        event.tags.push(event.tagReference());
         await event.publish();
         closeModal();
     }
@@ -77,7 +72,7 @@
             kind: 30000,
             tags: [
                 ['d', newListName ],
-                _event.tagReference(),
+                event.tagReference(),
             ],
         } as NostrEvent);
         await newListEvent.publish();

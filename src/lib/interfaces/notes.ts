@@ -1,9 +1,10 @@
-import { get as getStore } from 'svelte/store';
+import { get, get as getStore } from 'svelte/store';
 import {ndk as ndkStore} from '../store';
+import {currentUser as currentUserStore} from '../store';
 import { liveQuery } from 'dexie';
 import { db } from '$lib/interfaces/db';
 import type NDK from '@nostr-dev-kit/ndk';
-import type { NDKEvent, NDKFilter } from '@nostr-dev-kit/ndk';
+import type { NDKEvent, NDKFilter, NDKUser } from '@nostr-dev-kit/ndk';
 import {nip19} from 'nostr-tools';
 
 function valueFromTag(event: NDKEvent, tag: string): string | undefined {
@@ -18,6 +19,7 @@ interface ILoadOpts {
     articleNaddr?: string;
     replies?: string[];
     limit?: number;
+    kind?: number;
 };
 
 const NoteInterface = {
@@ -34,7 +36,12 @@ const NoteInterface = {
     },
 
     startStream: (opts: ILoadOpts = {}) => {
-        const filter: NDKFilter = { kinds: [1] };
+        const filter: NDKFilter = {};
+        if (opts.kind) {
+            filter['kinds'] = [opts.kind];
+        } else {
+            filter['kinds'] = [1];
+        }
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.replies) filter['#e'] = opts.replies;
         if (opts.ids) filter['ids'] = opts.ids;
@@ -55,8 +62,6 @@ const NoteInterface = {
 
         subs.on('event', async (event: NDKEvent) => {
             try {
-                console.log(`add note from ${event.pubkey}`);
-
                 const articleId = valueFromTag(event, 'a');
                 const eventId = valueFromTag(event, 'e');
 
@@ -113,7 +118,9 @@ const NoteInterface = {
             );
         } else if (opts.ids) {
             return liveQuery(() =>
-                db.notes.where('id').anyOf(opts.ids!).toArray()
+                db.notes.where('id').anyOf(opts.ids!)
+                    .reverse()
+                    .sortBy('createdAt')
             );
         } else {
             // return liveQuery(() => (db.notes.toArray()));

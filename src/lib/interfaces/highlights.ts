@@ -13,11 +13,12 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
     if (matchingTag) return matchingTag[1];
 }
 
-interface ILoadOpts {
+export interface ILoadOpts {
     pubkeys?: string[];
     articleNaddr?: string;
     url?: string;
     ids?: string[];
+    limit?: number;
 };
 
 // until I add delete support
@@ -52,6 +53,11 @@ const HighlightInterface = {
 
         if (opts.url) filter['#r'] = [opts.url];
 
+        if (opts.limit) {
+            filter['limit'] = opts.limit;
+            boostFilter['limit'] = opts.limit;
+        }
+
         const subs = ndk.subscribe(filter, { closeOnEose: false });
         const boostSubs = ndk.subscribe(boostFilter, { closeOnEose: false });
 
@@ -67,7 +73,8 @@ const HighlightInterface = {
                 db.highlights
                     .where('pubkey').anyOf(opts.pubkeys as string[])
                     .or('boostedBy').anyOf(opts.pubkeys as string[])
-                    .toArray()
+                    .reverse()
+                    .sortBy('timestamp')
             );
         } else if (opts.articleNaddr) {
             let articleReference: string | undefined;
@@ -87,7 +94,9 @@ const HighlightInterface = {
                 db.highlights.where('id').anyOf(opts.ids!).toArray()
             );
         } else {
-            return liveQuery(() => (db.highlights.toArray()));
+            return liveQuery(() => (db.highlights
+                .reverse()
+                .sortBy('timestamp')));
         }
     }
 };

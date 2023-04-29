@@ -16,6 +16,7 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
 interface ILoadOpts {
     pubkeys?: string[];
     naddr?: string;
+    decodedNaddrs?: string[];
 };
 
 const BookmarkListInterface = {
@@ -55,6 +56,12 @@ const BookmarkListInterface = {
                     .where({id: queryId})
                     .toArray()
             );
+        } else if (opts.decodedNaddrs) {
+            return liveQuery(() =>
+                db.bookmarkLists
+                    .where('id').anyOf(opts.decodedNaddrs)
+                    .toArray()
+            );
         }
     }
 };
@@ -77,6 +84,8 @@ async function eventHandler(event: NDKEvent) {
 
 async function handleEvent30001(event: NDKEvent) {
     const title = event.getMatchingTags('d')[0][1];
+    const descriptionTag = event.getMatchingTags('description')[0];
+    const description = descriptionTag ? descriptionTag[1] : '';
 
     const bookmarkList: App.BookmarkList = {
         id: event.tagId(),
@@ -84,7 +93,7 @@ async function handleEvent30001(event: NDKEvent) {
         createdAt: event.created_at! / 1000,
         naddr: event.encode(),
         title,
-        description: event.content,
+        description,
         event: JSON.stringify(event.rawEvent())
     };
 

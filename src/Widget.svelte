@@ -41,7 +41,7 @@
 
                 if (highlight) {
                     const noteEncode = nip19.noteEncode(highlight.id);
-                    const url = new URL('https://zapworthy.com/e/'+noteEncode);
+                    const url = new URL('https://highlighter.com/e/'+noteEncode);
                     window.open(url.href, '_blank');
                 }
             }

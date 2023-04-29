@@ -6,7 +6,7 @@
     import Hero from '$lib/components/Hero.svelte';
     import { onMount } from 'svelte';
     import { fetchArticle } from '$lib/article';
-    import Highlight from '$lib/components/HighlightList.svelte';
+    import Highlight from '$lib/components/HighlightListItem.svelte';
 
     let { note } = $page.params;
     let hexid = nip19.decode(note).data;

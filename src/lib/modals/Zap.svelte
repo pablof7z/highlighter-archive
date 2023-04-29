@@ -17,7 +17,7 @@
     let comment = '';
 
     async function zap() {
-        await $ndk.connect();
+        // await $ndk.connect();
         let zappedEvent = new NDKEvent($ndk, JSON.parse(highlight.event));
         let pr = await zappedEvent.zap(highlighterAmount*1000, comment);
 
