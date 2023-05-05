@@ -1,10 +1,11 @@
 <script lang="ts">
-    import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
+    import Note from '$lib/components/Note.svelte';
     import { parseContent } from '$lib/nip27';
+    import type { NDKTag } from '@nostr-dev-kit/ndk/lib/src/events';
     export let title: string | undefined = undefined;
     export let note: string;
-    export let tags: any[];
+    export let tags: NDKTag[] = [];
     let notePrev: string;
 
     const links = []
@@ -17,7 +18,7 @@
     $: if (note && note !== notePrev) {
         notePrev = note;
 
-        content = parseContent(note||"", tags);
+        content = parseContent(note, tags);
 
         // Find links and preceding whitespace
         for (let i = 0; i < content.length; i++) {
@@ -53,42 +54,33 @@
 }
 </script>
 
-<div class="
-    leading-relaxed
-    h-full flex flex-col sm:text-justify
-    text-black
-    overflow-auto
-">
-    {#if title}
-        <div class="text-sm text-gray-500">
-            {title}
-        </div>
-    {/if}
-
-    <div>
-        {#each content as { type, value }}
-            {#if type === "newline"}
-                {#each value as _}
-                    <br />
-                {/each}
-            {:else if type === "link"}
-                {value.replace(/https?:\/\/(www\.)?/, "")}
-                <!-- <img src="{value}" /> -->
-            {:else if type.startsWith("nostr:")}
-                {#if value.pubkey || value.entity.startsWith('npub')}
-                    <span class="text-purple-600">
-                        <Name pubkey={value.id} />
-                    </span>
-                {:else}
-                    «{value.entity}»
-                {/if}
-            {:else if type === "topic"}
-                <b>#{value}</b>
-
+<div>
+    {#each (content||[]) as { type, value }}
+        {#if type === "newline"}
+            {#each value as _}
+                <br />
+            {/each}
+        {:else if type === "link"}
+            {#if value.match(/(.jpg|.png|.gif)$/i)}
+                <div class="max-h-64 overflow-auto">
+                    <img src="{value}" />
+                </div>
             {:else}
-                {value}
+                {value.replace(/https?:\/\/(www\.)?/, "")}
             {/if}
-        {/each}
-    </div>
-</div>
+        {:else if type.startsWith("nostr:")}
+            {#if value.pubkey || value.entity.startsWith('npub')}
+                <span class="text-purple-600">
+                    <Name pubkey={value.id} />
+                </span>
+            {:else if value.entity.startsWith('nevent')}
+                <Note noteId={value.id} />
+            {/if}
+        {:else if type === "topic"}
+            <b>#{value}</b>
 
+        {:else}
+            {value}
+        {/if}
+    {/each}
+</div>

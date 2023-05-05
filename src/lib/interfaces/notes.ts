@@ -19,7 +19,7 @@ interface ILoadOpts {
     articleNaddr?: string;
     replies?: string[];
     limit?: number;
-    kind?: number;
+    kind?: number | null;
 };
 
 const NoteInterface = {
@@ -36,15 +36,20 @@ const NoteInterface = {
     },
 
     startStream: (opts: ILoadOpts = {}) => {
+        let closeOnEose = false;
         const filter: NDKFilter = {};
         if (opts.kind) {
-            filter['kinds'] = [opts.kind];
+            if (opts.kind !== null)
+                filter['kinds'] = [opts.kind];
         } else {
             filter['kinds'] = [1];
         }
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.replies) filter['#e'] = opts.replies;
-        if (opts.ids) filter['ids'] = opts.ids;
+        if (opts.ids) {
+            filter['ids'] = opts.ids;
+            closeOnEose = true;
+        }
 
         if (opts.limit) filter['limit'] = opts.limit;
 
@@ -58,7 +63,7 @@ const NoteInterface = {
 
         const ndk: NDK = getStore(ndkStore);
 
-        const subs = ndk.subscribe(filter, { closeOnEose: false, groupableDelay: 500 });
+        const subs = ndk.subscribe(filter, { closeOnEose, groupableDelay: 500 });
 
         subs.on('event', async (event: NDKEvent) => {
             try {

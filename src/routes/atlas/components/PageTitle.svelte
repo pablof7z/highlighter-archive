@@ -1,6 +1,6 @@
 <script lang="ts">
     export let title: string;
-    export let subtitle: string;
+    export let subtitle: string | undefined = undefined;
     export let timestamp: number | undefined = undefined;
 </script>
 

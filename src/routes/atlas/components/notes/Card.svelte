@@ -2,7 +2,7 @@
 	import CopyJson from './buttons/copy-json.svelte';
     import NoteInterface from '$lib/interfaces/notes';
     import NoteContent from './content.svelte';
-    import Bookmark from '../../../../lib/components/notes/buttons/bookmark.svelte';
+    import Bookmark from '$lib/components/events/buttons/bookmark.svelte';
     import Zaps from './buttons/zaps.svelte';
     import Boost from './buttons/boost.svelte';
 
@@ -196,9 +196,16 @@
 
     <div class="
         absolute
-        -right-7
+        -right-14
         text-gray-200 group-hover:text-gray-600 transition duration-300
     ">
         <CopyJson {note} />
+        <button class="
+            {($replies||[]).length > 0 ? 'text-gray-600' : ''}
+            flex flex-row items-center gap-2
+        " on:click={() => { showComments = !showComments; showReplies = showComments; }}>
+            <CommentIcon />
+            {($replies||[]).length}
+        </button>
     </div>
 </div>

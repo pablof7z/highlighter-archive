@@ -38,11 +38,12 @@
 </script>
 
 <div class="flex items-start space-x-4 w-full">
-    <div class="min-w-0 flex-1">
-        <form action="#" class="relative">
+    <div class="min-w-0 flex-1 relative">
             <div class="overflow-hidden rounded-b-lg shadow-sm ring-1 ring-inset ring-zinc-800 focus-within:ring-2 focus-within:ring-orange-900">
                 <label for="comment" class="sr-only">Add your comment</label>
-                <textarea rows="3" name="comment" id="comment" class="block w-full resize-none border-0 bg-transparent py-1.5  placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Add your comment..." bind:value={content}></textarea>
+                <textarea rows="3" name="comment" id="comment" class="block w-full resize-none border-0 bg-transparent py-1.5
+                text-gray-600
+                placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Add your comment..." bind:value={content}></textarea>
 
                     <!-- Spacer element to match the height of the toolbar -->
                     <div class="py-2" aria-hidden="true">
@@ -63,6 +64,5 @@
                 </button>
             </div>
             </div>
-        </form>
     </div>
 </div>

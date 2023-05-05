@@ -86,6 +86,7 @@ export const ndk = writable(new NDK({
 }));
 
 export const currentUser = writable<NDKUser | null>(null);
+export const backgroundBanner = writable<string | null>(null);
 
 let zapEvent: any;
 

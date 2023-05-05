@@ -1,16 +1,11 @@
 <script lang="ts">
-    import MyHighlightsIcon from '$lib/icons/MyHighlights.svelte';
-    import GlobalIcon from '$lib/icons/Global.svelte';
-    import FollowsIcon from '$lib/icons/Follows.svelte';
-	import RadioButton from '$lib/components/buttons/radio.svelte';
 	import Highlight from '$lib/components/HighlightListItem.svelte';
     import { page } from '$app/stores';
     import ArticleInterface from '$lib/interfaces/article';
     import HighlightInterface from '$lib/interfaces/highlights';
     import NoteInterface from '$lib/interfaces/notes';
     import { onMount } from 'svelte';
-    import { Tooltip } from 'flowbite-svelte';
-    import Widget from '../../../Widget.svelte';
+    import Widget from '../../../../Widget.svelte';
     import MarkdownIt from 'markdown-it';
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
@@ -20,22 +15,6 @@
     import HighlightIntroModal from '$lib/modals/HighlightIntro.svelte';
 
     const { naddr } = $page.params;
-
-    let mode = 'global';
-
-    // function setMode() {
-    //     switch (mode) {
-    //         case 'my':
-    //             myHighlights();
-    //             break;
-    //         case 'global':
-    //             globalHighlights();
-    //             break;
-    //         case 'network':
-    //             alert('coming soon™️!');
-    //             break;
-    //     }
-    // }
 
     let articles;
     let _articles: App.Article[] = [];
@@ -47,7 +26,7 @@
 
     let notes;
     let _notes: App.Note[] = [];
-    let activeSub: NDKSubscription | undefined;
+    let activeSub: NDKSubscription[] | undefined;
     let replacedHighlights: Record<string, boolean> = {};
 
     onMount(async () => {
@@ -89,11 +68,15 @@
     }
 </script>
 
-<div class="flex flex-col sm:flex-row w-screen sm:gap-12">
-    <div class="sm:w-3/5 text-lg p-8 bg-black shadow-lg text-justify text-slate-700 leading-loose flex flex-col gap-2">
+<div class="flex flex-row sm:flex-row w-full mx-auto px-6 h-screen">
+    <div class="
+        text-lg p-8 bg-black shadow-lg text-justify text-slate-700 leading-loose flex flex-col gap-2
+        rounded-xl w-7/12
+        overflow-auto
+    ">
         {#if article}
             <!-- Title -->
-            <h1 class="text-3xl sm:text-5xl font-black font-sans leading-normal">{article.title}</h1>
+            <h1 class="text-3xl sm:text-5xl text-white font-black font-sans leading-normal text-left">{article.title}</h1>
 
             <div class="flex flex-row justify-between">
                 <!-- Author / URL -->
@@ -146,37 +129,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sm:w-2/5 p-8 pt-4 sm:h-screen sm:overflow-scroll sm:fixed right-0">
-        <div class="flex flex-row items-center justify-between mb-8">
-            <div>
-                <a href="/" class="
-                    text-zinc-400 hover:text-white
-                    font-semibold
-                " name="highlights">
-                    ⚡️ <span class="font-black">HIGH</span>LIGHTER
-                </a>
-            </div>
-
-            <div class="flex flex-row text-slate-300 items-center justify-center
-                text-xs sm:text-lg
-            ">
-                <RadioButton bind:group={mode} value="my">
-                    <MyHighlightsIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">My Highlights</Tooltip>
-
-                <RadioButton bind:group={mode} value="global">
-                    <GlobalIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">Global Highlights Feed</Tooltip>
-
-                <RadioButton bind:group={mode} value="network">
-                    <FollowsIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">Highlights from people you follow</Tooltip>
-            </div>
-        </div>
-
+    <div class="px-4 overflow-auto w-5/12">
         {#if _highlights}
             <div class="flex flex-col gap-6">
                 {#each _highlights as highlight}
@@ -187,4 +140,4 @@
     </div>
 </div>
 
-<Widget loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" />
+<!-- <Widget loadHighlights={false} position="bottom-5 left-5 flex-col-reverse" /> -->

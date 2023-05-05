@@ -1,5 +1,5 @@
 <div class="
-    text-xl sm:p-8 bg-zinc-900 sm:shadow-2xl text-justify text-gray-300 leading-loose
+    text-xl sm:shadow-2xl text-justify text-gray-300 leading-loose
     overflow-scroll
 ">
     <slot />
@@ -9,18 +9,21 @@
     :global(article h1) {
         font-weight: 600;
         font-size: 2rem;
+        font-family: Inter;
         margin-top: 1.5rem;
     }
 
     :global(article h2) {
         font-weight: 600;
         font-size: 1.75rem;
+        font-family: Inter;
         margin-top: 1.5rem;
     }
 
     :global(article h3) {
         font-weight: 600;
         font-size: 1.5rem;
+        font-family: Inter;
         margin-top: 1.5rem;
     }
 

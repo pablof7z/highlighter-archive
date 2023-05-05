@@ -19,7 +19,7 @@
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import { ndk } from '$lib/store';
-    import { NDKEvent } from '@nostr-dev-kit/ndk';
+    import { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';
     import Note from '$lib/components/Note.svelte';
@@ -45,6 +45,7 @@
     let naddr: string;
     let copiedEventId = false;
     let highlightNoteId = '';
+    let highlightUser = new NDKUser({hexpubkey: highlight.pubkey});
 
     function copyId() {
         if (!highlightNoteId) return;
@@ -194,12 +195,12 @@
 
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col gap-4">
     <div class="
         flex flex-col h-full gap-4
         border border-gray-950 hover:border-gray-900
-        px-6 pt-6 pb-4 rounded-xl
-        bg-zinc-900 hover:bg-gray-950
+        p-8 pb-4 rounded-xl
+        bg-black hover:bg-gray-950
         transition duration-100
     " style="max-height: 40rem;">
 
@@ -209,8 +210,8 @@
                 <div class="flex flex-col gap-2">
                     <a href={articleLink} class="
                         text-gray-600
-                        font-semibold text-2xl
-                        font-serif
+                        font-bold text-2xl
+                        font-sans
                     ">
                         {article?.title||domain||'Untitled'}
                     </a>
@@ -241,7 +242,7 @@
 
         <!-- Content -->
         <a href={articleLink} on:click={onContentClick} class="
-            text-lg leading-relaxed text-gray-200 h-full flex flex-col sm:text-justify
+            text-lg leading-relaxed text-gray-200 h-full flex flex-col
             px-6 py-4
             my-2
             border-l border-slate-500
@@ -257,16 +258,17 @@
             justify-between
             w-full
             rounded-b-lg
-            py-4
-            pb-0
+            py-4 pb-0
         ">
             <div class="flex flex-row gap-4 items-center whitespace-nowrap">
-                <div class="flex flex-row gap-4 items-center justify-center">
+                <a
+                    href="/p/{highlightUser.npub}"
+                    class="flex flex-row gap-4 items-center justify-center">
                     <Avatar pubkey={highlight.pubkey} klass="h-6" />
                     <div class=" text-gray-500 text-xs hidden sm:block">
                         <Name pubkey={highlight.pubkey} />
                     </div>
-                </div>
+                </a>
                 {#if ($replies||[]).length > 0}
                     <button class="text-sm text-gray-500"
                         on:click={() => { showReplies = !showReplies }}
@@ -347,7 +349,7 @@
         </div>
     </div>
 
-    <div class="ml-6 {showReplies ? 'block' : 'hidden'}">
+    <div class="ml-6 flex flex-col gap-6 {showReplies ? 'block' : 'hidden'}">
         {#each ($replies||[]) as reply}
             <Note note={reply} />
         {/each}

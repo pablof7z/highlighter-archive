@@ -11,47 +11,23 @@
     import { ndk, currentUser } from '$lib/store';
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
     import { onMount } from 'svelte';
+  import { generateEphemeralSigner, saveEphemeralSigner } from '$lib/signers/ephemeral';
 
     let key;
-    let sendEvent;
     let privateNote, privateEvent;
 
-    const PRIVATE_NOTE_VERSION = '1';
+    async function newNote() {
+        const title = await prompt('Title?');
 
-    async function newNote(title) {
-        title = await prompt('Title?');
-
-        // generate new key
-        key = NDKPrivateKeySigner.generate();
+        const signer = await generateEphemeralSigner();
 
         // generate root event with new key
         privateNote = new NDKEvent($ndk, {
             kind: 31013,
             content: ""
         } as NostrEvent);
-        const keyUser = await key.user();
-
-        privateNote.pubkey = keyUser.hexpubkey();
         privateEvent = await privateNote.toNostrEvent();
-
-        // send key over DM
-        const sendKeyEvent = new NDKEvent($ndk, {
-            kind: 4,
-            content: JSON.stringify({
-                key: key.privateKey,
-                naddr: privateNote.encode(),
-                version: PRIVATE_NOTE_VERSION,
-                title
-            }),
-            tags: [
-                ['p', $currentUser!.hexpubkey() ],
-                ['client', 'atlas']
-            ]
-        } as NostrEvent);
-        await sendKeyEvent.encrypt($currentUser, $ndk.signer);
-        await sendKeyEvent.publish();
-
-        sendEvent = await sendKeyEvent.toNostrEvent();
+        await saveEphemeralSigner($ndk, $ndk.signer!, signer, { metadata: { title } });
     }
 
     let encryptedNotes: any;

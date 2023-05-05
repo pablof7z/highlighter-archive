@@ -11,7 +11,7 @@ interface ILoadOpts {
 
 const UserInterface = {
     get: (opts: GetUserParams): Observable<App.UserProfile> => {
-        if (opts.hexpubkey) {
+        if (opts.hexpubkey && browser) {
             db.users.where({ id: opts.hexpubkey }).first().then((user) => {
                 if (!user) {
                     const ndk = getStore(ndkStore);

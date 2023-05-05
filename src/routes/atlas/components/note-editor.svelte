@@ -1,21 +1,19 @@
 <script lang="ts">
-    import {currentUser, ndk} from '$lib/store';
-
-    import NewIcon from '$lib/icons/New.svelte';
-    import ToolbarButton from './toolbar/button.svelte';
+    import {ndk} from '$lib/store';
     import NoteVisibility from './note/visibility.svelte';
 
-    import Name from '$lib/components/Name.svelte';
-
     import { createEventDispatcher } from 'svelte';
-    import { NDKEvent } from '@nostr-dev-kit/ndk';
+    import { NDKEvent, NDKPrivateKeySigner, NDKUser } from '@nostr-dev-kit/ndk';
     import type { NDKTag, NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
+    import type { NDKSigner } from '@nostr-dev-kit/ndk/lib/src/signers';
     const dispatch = createEventDispatcher();
 
     export let title: string;
-    export let body: string;
+    export let body: string = '';
     export let visibility: string;
     export let expandEditor = false;
+    export let delegatedSigner: NDKPrivateKeySigner;
+    export let delegatedName: string;
 
     let bodyEl: HTMLTextAreaElement;
     let titleEl: HTMLInputElement;
@@ -42,23 +40,27 @@
         }
     }
 
-    async function save(kind: number) {
+    async function saveNote(authorSigner: NDKSigner, kind: number, encrypt: boolean) {
+        const author: NDKUser = await authorSigner.user();
         const tags: NDKTag[] = [];
         let content;
         body = (body||'').trim();
 
-        tags.push(['p', $currentUser!.hexpubkey()]);
+        encrypt && tags.push(['p', author.hexpubkey()]);
         tags.push(['client', 'atlas']);
 
         if (title && body.trim().length > 0) {
-            const encryptedTitle: string = await $ndk.signer?.encrypt($currentUser!, title)!;
+            let _title: string = title;
+            if (encrypt) {
+                _title = await authorSigner.encrypt(author, title)!;
 
-            if (!encryptedTitle) {
-                alert('encryption failed');
-                return;
+                if (!_title) {
+                    alert('encryption failed');
+                    return;
+                }
             }
 
-            tags.push(['subject', encryptedTitle]);
+            tags.push(['subject', _title]);
             content = body.trim();
         } else {
             content = title || '';
@@ -66,11 +68,13 @@
         }
 
         const event = new NDKEvent($ndk, {
-            kind: 4,
+            kind,
             content,
             tags,
+            pubkey: author.hexpubkey(),
         } as NostrEvent);
-        await event.encrypt($currentUser!, $ndk.signer);
+        encrypt && await event.encrypt(author, authorSigner);
+        await event.sign(authorSigner);
         await event.publish();
 
         return event;
@@ -80,11 +84,13 @@
         let e;
 
         switch (visibility) {
-            case 'Secret': e = await saveSecret(); break;
+            case 'Public': e = await saveNote($ndk.signer!, 1, false); break;
+            case 'Secret': e = await saveNote($ndk.signer!, 4, true); break;
+            case 'Delegated': e = await saveNote(delegatedSigner, 1, false); break;
         }
 
         if (e) {
-            dispatch('saved', e);
+            dispatch('saved', { event: e, visibility });
         }
     }
 </script>
@@ -123,7 +129,7 @@
     ">
         {#if expandEditor}
             <div class="flex flex-row items-center gap-4">
-                <NoteVisibility bind:value={visibility} />
+                <NoteVisibility bind:value={visibility} {delegatedName} />
             </div>
         {/if}
 

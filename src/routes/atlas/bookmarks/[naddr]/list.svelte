@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Visibility from './../../components/note/visibility.svelte';
 	import NewIcon from '$lib/icons/New.svelte';
 
     import { currentUser, ndk } from '$lib/store';
@@ -9,9 +10,10 @@
     import NoteEditor from '../../components/note-editor.svelte';
     import Tags from './tags.svelte';
     import { onDestroy, onMount } from 'svelte';
-    import { NDKEvent, NDKSubscription } from '@nostr-dev-kit/ndk';
+    import { NDKEvent, NDKPrivateKeySigner, NDKSubscription, NDKUser } from '@nostr-dev-kit/ndk';
     import type { NDKTag } from '@nostr-dev-kit/ndk/lib/src/events';
     import { nip19 } from 'nostr-tools';
+    import { findEphemeralSigner, generateEphemeralSigner, saveEphemeralSigner } from '$lib/signers/ephemeral';
 
     export let naddr: string;
     let prevNaddr: string;
@@ -22,6 +24,7 @@
     let encryptedTags: NDKTag[] = [];
 
     let activeSubs: NDKSubscription[] = [];
+    let currentUserPubkeys: string[] = [];
 
     async function loadbookmarkLists() {
         const user = await $ndk.signer?.user();
@@ -55,6 +58,10 @@
 
     let listEvent: NDKEvent;
 
+    $: if (currentUserPubkeys) {
+        console.log(`triggering  {currentUserPubkeys}`, currentUserPubkeys)
+    }
+
     $: {
         // reset
         if (naddr !== prevNaddr) {
@@ -62,37 +69,56 @@
             encryptedTags = [];
             tags = [];
             bookmarkList = null;
+            listSigner = NDKPrivateKeySigner.generate();
+            signerSaved = false;
             removeSubscription();
             loadbookmarkLists();
         } else {
-            if ($bookmarkLists && $bookmarkLists[0] && bookmarkList?.createdAt !== $bookmarkLists[0].createdAt) {
-                bookmarkList = $bookmarkLists[0];
+            if ($currentUser)
+                currentUserPubkeys = [$currentUser.hexpubkey()];
+                currentUserPubkeys = currentUserPubkeys;
 
+            if ($bookmarkLists && $bookmarkLists[0] && bookmarkList?.createdAt !== $bookmarkLists[0].createdAt) { bookmarkList = $bookmarkLists[0];
                 listEvent = new NDKEvent($ndk, JSON.parse(bookmarkList.event));
-                decryptTags();
+                decryptTags().then(findListKey)
                 tags = listEvent.tags;
             }
         }
 	}
 
+    async function findListKey() {
+        if (!signerSaved) {
+            console.log('findListKey')
+            const s = await findEphemeralSigner($ndk, $ndk.signer!, bookmarkList?.title || 'bookmark list');
+
+            if (s) {
+                listSigner = s;
+                const listUser = await listSigner.user();
+                currentUserPubkeys.push(listUser.hexpubkey())
+                currentUserPubkeys = currentUserPubkeys;
+                signerSaved = true;
+                console.log(`found a signer`, currentUserPubkeys);
+            }
+        }
+    }
+
     async function decryptTags() {
         try {
-            await listEvent.decrypt($currentUser!);
-            const a = JSON.parse(listEvent.content);
-            if (a && a[0]) {
-                encryptedTags = a;
+            if (listEvent.content.length > 0) {
+                await listEvent.decrypt($currentUser!);
+                const a = JSON.parse(listEvent.content);
+                if (a && a[0]) {
+                    encryptedTags = a;
+                }
             }
         } catch (e) {
             console.error(e);
         }
     }
 
-    let showAdd = false;
 
     async function save() {
         if (!addNewItemValue || addNewItemValue.length === 0) {
-            console.log('here');
-
             return;
         }
 
@@ -125,9 +151,6 @@
             }
         }
 
-        console.log(tag);
-
-
         listEvent.tags.push(tag);
         await listEvent.sign();
         await listEvent.publish();
@@ -136,7 +159,11 @@
 
     let newItemType: string | undefined;
     let addNewItemValue = '';
-    let newItemVisibility = 'Secret';
+    let newItemVisibility = 'Delegated';
+
+    let listSigner = generateEphemeralSigner(); // this should try to be replaced onMount in case a key has already been generated for this list
+    let signerSaved = false;
+    let showSaveButton = false;
 
     function onNewItemChange() {
         const patterns: string[] = ['npub1', 'naddr', 'note1', 'nprofile', 'nevent', 'http'];
@@ -154,33 +181,60 @@
         } else {
             newItemType = undefined;
         }
+
+        showSaveButton = !!newItemType;
     }
 
     async function onNoteEditorSaved(e: CustomEvent) {
-        const event = e.detail as NDKEvent;
+        const { event, visibility } = e.detail;
         const tag = event.tagReference();
 
-        // if the current list has a content, decrypt it
-        if (listEvent?.content) {
-            let tags;
-
+        // check if we need to save an ephemeral key
+        if (visibility === 'Delegated' && !signerSaved) {
             try {
-                tags = JSON.parse(listEvent.content);
+                const listUser = await listSigner.user();
+                currentUserPubkeys.push(listUser.hexpubkey());
+                currentUserPubkeys = currentUserPubkeys;
+                await saveEphemeralSigner($ndk, listSigner, {
+                    associatedEvent: listEvent,
+                    name: bookmarkList?.title || 'bookmark list',
+                    keyProfile: {
+                        name: bookmarkList?.title || 'bookmark list',
+                    }
+                });
             } catch (e) {
-                console.error('trying to parse list content as JSON', e);
-                return;
+                console.error(e);
+                throw e;
             }
-
-            if (!tags || !tags) tags = [];
-
-            tags.push(tag);
-
-            listEvent.content = JSON.stringify(tags);
-        } else {
-            listEvent.content = JSON.stringify([tag]);
         }
 
-        await listEvent.encrypt($currentUser!);
+        if (visibility === 'Delegated' || visibility === 'Public') {
+            listEvent.tags.push(tag)
+        } else if (visibility === 'Secret') {
+            // if the current list has a content, decrypt it
+            if (listEvent?.content) {
+                let tags;
+
+                try {
+                    tags = JSON.parse(listEvent.content);
+                } catch (e) {
+                    console.error('trying to parse list content as JSON', e);
+                    return;
+                }
+
+                if (!tags || !tags) tags = [];
+
+                tags.push(tag);
+
+                listEvent.content = JSON.stringify(tags);
+            } else {
+                listEvent.content = JSON.stringify([tag]);
+            }
+
+            await listEvent.encrypt($currentUser!);
+        }
+
+
         await listEvent.sign();
         await listEvent.publish();
 
@@ -189,17 +243,29 @@
     }
 </script>
 
+{JSON.stringify(listEvent?.tags)}
+
 {#if listEvent}
     <div class="flex flex-col gap-8">
         <!-- Header -->
-        <PageTitle title={bookmarkList?.title} subtitle={bookmarkList?.description}>
-        </PageTitle>
+        <PageTitle
+            title={bookmarkList?.title}
+            subtitle={bookmarkList?.description}
+        />
 
         <div class="grid grid-flow-row md:grid-cols-1 max-w-prose lg:sdgrid-cols-3 gap-4">
             <div class="relative flex flex-row items-center justify-center mb-8">
                 {#if newItemType === 'note'}
                     <div class="pb-4 w-full">
-                        <NoteEditor expandEditor={true} bind:title={addNewItemValue} on:keyup={onNewItemChange} on:saved={onNoteEditorSaved} bind:visibility={newItemVisibility} />
+                        <NoteEditor
+                            expandEditor={true}
+                            delegatedSigner={listSigner}
+                            delegatedName={bookmarkList?.title||"test"}
+                            bind:title={addNewItemValue}
+                            on:keyup={onNewItemChange}
+                            on:saved={onNoteEditorSaved}
+                            bind:visibility={newItemVisibility}
+                        />
                     </div>
                 {:else}
                     <div class="
@@ -218,24 +284,27 @@
                             focus:outline-none
                         " placeholder="Start typing" />
 
-                        <div class="flex flex-row gap-2">
-                            <NoteVisibility bind:visibility={newItemVisibility} />
-                            <button
-                                class="inline-flex items-center gap-x-2 rounded-md bg-gradient-to-br from-orange-500 to-red-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-orange-600 hover:to-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500
-                                px-4
-                            " on:click={save}>
-                                Save
-                            </button>
-                        </div>
+                        {#if showSaveButton}
+                            <div class="flex flex-row gap-2">
+                                <NoteVisibility bind:value={newItemVisibility} />
+                                <button
+                                    class="inline-flex items-center gap-x-2 rounded-md bg-gradient-to-br from-orange-500 to-red-600 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-orange-600 hover:to-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500
+                                    px-4
+                                " on:click={save}>
+                                    Save
+                                </button>
+                            </div>
+                        {/if}
                     </div>
                 {/if}
             </div>
 
             {#if encryptedTags}
-                <Tags tags={encryptedTags} kind={4} />
+                <Tags tags={encryptedTags} kind={4} {currentUserPubkeys} />
             {/if}
 
-            <Tags tags={tags} />
+            <Tags tags={tags} {currentUserPubkeys} />
+            {currentUserPubkeys}
 
         </div>
     </div>

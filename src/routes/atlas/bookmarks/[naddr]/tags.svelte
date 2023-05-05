@@ -13,6 +13,7 @@
 
     export let kind = 1;
     export let tags: NDKTag[];
+    export let currentUserPubkeys: string[] = [];
     let noteIds: string[];
     let peopleIds: string[];
     let urlTags: string[];
@@ -29,6 +30,10 @@
     let taggedHighlightIds = new Set();
 
     let highlightSub: NDKSubscription[] | undefined;
+
+    $: if ($currentUser && !currentUserPubkeys.includes($currentUser.hexpubkey())) {
+        currentUserPubkeys.push($currentUser.hexpubkey());
+    }
 
     $: {
         if (prevRawTagList !== tags) {
@@ -122,21 +127,24 @@
         </div>
     </div>
 {/each}
+
 {#each taggedNotes as tag}
     <div class="h-full">
         <Note
             note={tag}
-            skipHeader={tag.pubkey === $currentUser?.hexpubkey()}
-            skipFooter={tag.pubkey === $currentUser?.hexpubkey()}
+            skipHeader={true}
+            skipFooter={true}
             compact={true}
         />
     </div>
 {/each}
+
 {#each taggedHighlights as tag}
     <div class="h-full">
         <Highlight highlight={tag} />
     </div>
 {/each}
+
 {#each peopleIds as personId}
     <div class="h-full">
         <UserCard pubkey={personId} />

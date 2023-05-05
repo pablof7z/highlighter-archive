@@ -11,7 +11,7 @@
     import NoteInterface from '$lib/interfaces/notes';
     import { onMount } from 'svelte';
     import { Tooltip } from 'flowbite-svelte';
-    import Widget from '../../Widget.svelte';
+    import Widget from '../../../Widget.svelte';
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import Article from '$lib/components/Article.svelte';
@@ -181,36 +181,6 @@
 
     <!-- Sidebar -->
     <div class="sm:w-2/5 p-8 pt-4 sm:h-screen sm:overflow-scroll sm:fixed right-0">
-        <div class="flex flex-row items-center justify-between mb-8">
-            <div>
-                <a href="/" class="
-                    text-zinc-400 hover:text-white
-                    font-semibold
-                " name="highlights">
-                    ⚡️ <span class="font-black">HIGH</span>LIGHTER
-                </a>
-            </div>
-
-            <div class="flex flex-row text-slate-300 items-center justify-center
-                text-xs sm:text-lg
-            ">
-                <RadioButton bind:group={mode} value="my">
-                    <MyHighlightsIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">My Highlights (coming soon)</Tooltip>
-
-                <RadioButton bind:group={mode} value="global">
-                    <GlobalIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">Global Highlights Feed (coming soon)</Tooltip>
-
-                <RadioButton bind:group={mode} value="network">
-                    <FollowsIcon />
-                </RadioButton>
-                <Tooltip placement="bottom">Highlights from people you follow (coming soon)</Tooltip>
-            </div>
-        </div>
-
         {#if _highlights}
             <div class="flex flex-col gap-6">
                 {#each _highlights as highlight}

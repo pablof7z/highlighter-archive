@@ -2,8 +2,6 @@
     import { page } from '$app/stores';
     import HighlightInterface from '$lib/interfaces/highlights';
     import { nip19 } from 'nostr-tools';
-    import Widget from '../../../Widget.svelte';
-    import Hero from '$lib/components/Hero.svelte';
     import { onMount } from 'svelte';
     import { fetchArticle } from '$lib/article';
     import Highlight from '$lib/components/HighlightListItem.svelte';
@@ -39,8 +37,6 @@
 	<title>HIGHLIGHTER.com</title>
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
-
-<Hero />
 
 <main class="max-w-xl mx-auto pb-32">
     {#each _highlights as highlight}
