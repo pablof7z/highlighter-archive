@@ -1,11 +1,8 @@
 <script lang="ts">
     import { ndk } from '$lib/store';
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
-    import UserCard from '$lib/components/UserCard.svelte';
-    import PillButton from '$lib/components/buttons/pill.svelte';
     import CloseIcon from '$lib/icons/Close.svelte';
     import { NDKEvent, zapInvoiceFromEvent } from '@nostr-dev-kit/ndk';
-    import { requestProvider } from 'webln';
 
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';

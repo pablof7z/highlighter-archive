@@ -9,11 +9,13 @@
     import NavigationButton from './components/navigation/Button.svelte';
 
     import { ndk, currentUser } from '$lib/store';
+    import { Modals, closeModal } from 'svelte-modals'
+    import { fade } from 'svelte/transition'
 
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
     import { onMount } from 'svelte';
     import ListItem from './components/navigation/list-item.svelte';
-  import { NDKEvent } from '@nostr-dev-kit/ndk';
+    import { NDKEvent } from '@nostr-dev-kit/ndk';
 
     let bookmarkLists, _bookmarkLists: App.BookmarkList[] = [];
 
@@ -146,6 +148,15 @@
     </main>
 </div>
 
+<Modals>
+    <div
+        slot="backdrop"
+        class="backdrop"
+        on:click={closeModal}
+        transition:fade>
+    />
+</Modals>
+
 <style>
     :global(html) {
         background-color: #f7f7f7 !important;
@@ -153,5 +164,20 @@
 
     :global(body) {
         background-color: #f7f7f7 !important;
+    }
+
+    .backdrop {
+        position: fixed;
+        z-index: 99999;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        backdrop-filter: blur(0.15rem);
+        left: 0;
+        background: rgba(0,0,0,0.50)
+    }
+
+    :global(.modal) {
+        z-index: 99999999;
     }
 </style>

@@ -64,7 +64,7 @@
                     text-zinc-500 hover:text-white
                     bg-whitse hover:bg-orange-600
                     px-4 py-2 rounded-xl
-                " on:click={() => { openModal(NewListModal) }}>Generic List</button>
+                " on:click={() => { openModal(NewListModal, {}) }}>Generic List</button>
             </div>
         {/if}
     </div>

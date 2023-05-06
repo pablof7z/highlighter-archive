@@ -85,9 +85,16 @@
         event.dataTransfer.setData('id', note.id as string);
         event.dataTransfer.setData('tag', JSON.stringify(tag));
     }
+
+    let showCompact = compact;
+
+    function toggleCompactView() {
+        showCompact = (!showCompact || !compact);
+    }
 </script>
 
-<div class="relative flex flex-row w-full group">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="relative flex flex-row w-full group" on:click={toggleCompactView}>
     <div
         class="flex flex-col h-full flex-grow"
         draggable={true}
@@ -99,11 +106,11 @@
             border border-zinc-200 hover:border-zinc-200
             rounded-xl
             bg-white hover:bg-slate-50 transition duration-200 ease-in-out
-            {compact ? 'px-6 py-4' : 'px-6 pt-6 pb-4'}
+            {showCompact ? 'px-6 py-4' : 'px-6 pt-6 pb-4'}
         " style="max-height: 40rem;">
 
             <!-- Header -->
-            {#if !skipHeader}
+            {#if !showCompact}
                 <div class="flex flex-row items-center justify-between">
                     <div class="flex flex-row gap-4 items-center justify-center">
                         <Avatar pubkey={note.pubkey} klass="h-6" />
@@ -122,7 +129,7 @@
             <NoteContent note={content} tags={event.tags} title={event.kind === 4 ? title : undefined} />
 
             <!-- Footer -->
-            {#if !skipFooter}
+            {#if !showCompact}
                 <div class="
                     flex flex-row
                     items-center

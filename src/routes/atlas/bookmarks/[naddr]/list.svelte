@@ -182,7 +182,10 @@
             newItemType = undefined;
         }
 
-        showSaveButton = !!newItemType;
+        if (newItemType !== 'note' && addNewItemValue.length > 3) {
+            showSaveButton = true;
+            newItemVisibility = 'Public';
+        }
     }
 
     async function onNoteEditorSaved(e: CustomEvent) {

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import { parseContent } from '$lib/nip27';
     export let title: string | undefined = undefined;
@@ -77,7 +76,7 @@
             {:else if type.startsWith("nostr:")}
                 {#if value.pubkey || value.entity.startsWith('npub')}
                     <span class="text-purple-600">
-                        <Name pubkey={value.id} />
+                        <Name pubkey={value.id||value.pubkey} />
                     </span>
                 {:else}
                     «{value.entity}»
