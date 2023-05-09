@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
@@ -7,8 +7,84 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 	</head>
-	<!-- bg-white dark:bg-black -->
-	<body>
+	<body class="h-full">
 		<div>%sveltekit.body%</div>
 	</body>
 </html>
+
+<style>
+	@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-Thin.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-Medium.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-SemiBold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-Bold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-ExtraBold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url(/fonts/Outfit/Outfit-Black.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Hanken Grotesk';
+    font-style: 'normal';
+    src: url("/fonts/Hanken Grotesk/HankenGrotesk-VariableFont_wght.ttf") format('truetype');
+}
+
+h1 {
+    font-family: 'Hanken Grotesk';
+}
+
+body {
+    font-family: 'Hanken Grotesk', 'Outfit', sans-serif;
+}
+
+mark {
+    background: rgba(255, 97, 9, 0.1);
+}
+
+</style>

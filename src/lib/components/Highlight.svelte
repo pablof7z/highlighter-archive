@@ -24,12 +24,13 @@
     export let skipUrl: boolean = false;
 
     let replies;
+    let quotes;
     let article;
-    let zap = false;
 
     onMount(() => {
         if (highlight?.id) {
             replies = NoteInterface.load({ replies: [highlight.id] });
+            quotes = NoteInterface.load({ quotes: [highlight.id] });
 
             if (highlight.articleId) {
                 article = ArticleInterface.load({ id: highlight.articleId });
@@ -110,18 +111,18 @@
                     class="text-slate-500 hover:text-purple-700"
                     on:click={() => { openModal(BookmarkModal, { highlight, article }) }}
                 ><BookmarkIcon /></button>
-                <Tooltip>Bookmark</Tooltip>
+                <Tooltip  color="black">Bookmark</Tooltip>
 
                 <button
                     class="text-slate-500 hover:text-purple-700"
                     on:click={() => { openModal(ZapModal, { highlight, article }) }}
                 ><ZapIcon /></button>
-                <Tooltip>Zap</Tooltip>
+                <Tooltip  color="black">Zap</Tooltip>
 
                 <button class="text-slate-500 hover:text-purple-700">
                     <BoostIcon />
                 </button>
-                <Tooltip>Boost</Tooltip>
+                <Tooltip  color="black">Boost</Tooltip>
 
                 <button
                     class="text-slate-500 hover:text-purple-700"

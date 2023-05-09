@@ -34,7 +34,7 @@
     let event: NDKEvent | undefined = undefined;
     let showComment = false;
 
-    $: if ($noteQuery) {
+    $: if ($noteQuery && !_note !== $noteQuery[0]) {
         _note = $noteQuery[0];
         console.log('setting it', $noteQuery[0]);
     }

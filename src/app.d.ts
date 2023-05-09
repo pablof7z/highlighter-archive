@@ -5,6 +5,7 @@ declare global {
             url: string;
             title: string;
             publisher: string;
+            tags: string[];
             content: string;
             author?: string;
             event: string;
@@ -12,10 +13,11 @@ declare global {
 
         interface Highlight {
             id?: string;
-            url: string;
+            url?: string;
             pubkey: string;
             boostedBy?: string;
             content: string;
+            context?: string;
             articleId?: string;
             event: string;
             timestamp: number;
@@ -27,6 +29,7 @@ declare global {
             content: string;
             replyToArticleId?: string;
             replyToEventId?: string;
+            quotesEventId?: string;
             event: string;
             createdAt: number;
         }

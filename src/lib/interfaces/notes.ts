@@ -18,6 +18,7 @@ interface ILoadOpts {
     pubkeys?: string[];
     articleNaddr?: string;
     replies?: string[];
+    quotes?: string[];
     limit?: number;
     kind?: number | null;
 };
@@ -46,6 +47,7 @@ const NoteInterface = {
         }
         if (opts.pubkeys) filter['authors'] = opts.pubkeys;
         if (opts.replies) filter['#e'] = opts.replies;
+        if (opts.quotes) filter['#q'] = opts.quotes;
         if (opts.ids) {
             filter['ids'] = opts.ids;
             closeOnEose = true;
@@ -65,26 +67,7 @@ const NoteInterface = {
 
         const subs = ndk.subscribe(filter, { closeOnEose, groupableDelay: 500 });
 
-        subs.on('event', async (event: NDKEvent) => {
-            try {
-                const articleId = valueFromTag(event, 'a');
-                const eventId = valueFromTag(event, 'e');
-
-                const note: App.Note = {
-                    id: event.tagId(),
-                    pubkey: event.pubkey,
-                    content: event.content,
-                    replyToArticleId: articleId,
-                    replyToEventId: eventId,
-                    event: JSON.stringify(event.rawEvent()),
-                    createdAt: event.created_at!
-                };
-
-                await db.notes.put(note);
-            } catch (e) {
-                console.error(e);
-            }
-        });
+        subs.on('event', processEvent);
     },
 
     load: (opts: ILoadOpts = {}) => {
@@ -121,6 +104,10 @@ const NoteInterface = {
             return liveQuery(() =>
                 db.notes.where('replyToEventId').anyOf(opts.replies!).toArray()
             );
+        } else if (opts.quotes) {
+            return liveQuery(() =>
+                db.notes.where('quotesEventId').anyOf(opts.quotes!).toArray()
+            );
         } else if (opts.ids) {
             return liveQuery(() =>
                 db.notes.where('id').anyOf(opts.ids!)
@@ -132,5 +119,28 @@ const NoteInterface = {
         }
     }
 };
+
+async function processEvent(event: NDKEvent) {
+    try {
+        const articleId = valueFromTag(event, 'a');
+        const eventId = valueFromTag(event, 'e');
+        const quotesEventId = valueFromTag(event, 'q');
+
+        const note: App.Note = {
+            id: event.tagId(),
+            pubkey: event.pubkey,
+            content: event.content,
+            replyToArticleId: articleId,
+            replyToEventId: eventId,
+            quotesEventId,
+            event: JSON.stringify(event.rawEvent()),
+            createdAt: event.created_at!
+        };
+
+        await db.notes.put(note);
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 export default NoteInterface;

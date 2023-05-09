@@ -1,5 +1,5 @@
 <div class="
-    text-xl sm:shadow-2xl text-justify text-gray-300 leading-loose
+    text-xl text-justify leading-loose
     overflow-scroll
 ">
     <slot />
@@ -55,7 +55,6 @@
     }
 
     :global(article mark) {
-        background-color: rgb(227, 151, 35);
         color: black;
         padding: 0.25rem;
     }

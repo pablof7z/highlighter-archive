@@ -42,6 +42,8 @@ const ArticleInterface = {
 
         const ndk: NDK = getStore(ndkStore);
 
+        console.log(`subscribing to ${JSON.stringify(filter)}`);
+
         const subs = ndk.subscribe(filter);
 
         subs.on('event', async (event: NDKEvent) => {
@@ -56,6 +58,7 @@ const ArticleInterface = {
                     publisher: event.pubkey,
                     content: event.content,
                     author: valueFromTag(event, 'author') || event.pubkey,
+                    tags: event.tags.filter(t => t[0] === 't').map(t => t[1]),
                     event: JSON.stringify(await event.toNostrEvent())
                 };
 

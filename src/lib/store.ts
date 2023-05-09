@@ -73,7 +73,7 @@ const dexieCacheAdaper = new DexieAdapter();
 export const ndk = writable(new NDK({
     explicitRelayUrls: [
         'wss://purplepag.es',
-        // 'ws://localhost:8080',
+        'ws://localhost:8080',
         'wss://nos.lol',
         'wss://relay.f7z.io',
         'wss://relay.damus.io',
@@ -82,10 +82,14 @@ export const ndk = writable(new NDK({
         'wss://atlas.nostr.land/',
         'wss://offchain.pub/'
     ],
+    devWriteRelayUrls: [
+        'ws://localhost:8080',
+    ],
     cacheAdapter: dexieCacheAdaper,
 }));
 
 export const currentUser = writable<NDKUser | null>(null);
+export const currentUserFollowPubkeys = writable<string[] | undefined>(undefined);
 export const backgroundBanner = writable<string | null>(null);
 
 let zapEvent: any;

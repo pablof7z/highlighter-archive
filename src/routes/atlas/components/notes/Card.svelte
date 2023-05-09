@@ -148,7 +148,7 @@
                                     {($replies||[]).length} comments
                                 </span>
                             </button>
-                            <Tooltip>
+                            <Tooltip  color="black">
                                 View comments
                             </Tooltip>
                         {/if}
@@ -166,7 +166,7 @@
                                 <CommentIcon />
                                 {($replies||[]).length}
                             </button>
-                            <Tooltip>Discuss</Tooltip>
+                            <Tooltip  color="black">Discuss</Tooltip>
 
                         <a href={`/e/${noteId}`} class="
                             text-slate-500 hover:text-orange-500
@@ -174,7 +174,7 @@
                         ">
                             <LinkIcon />
                         </a>
-                        <Tooltip>Link to this note</Tooltip>
+                        <Tooltip  color="black">Link to this note</Tooltip>
                     </div>
                 </div>
             {/if}

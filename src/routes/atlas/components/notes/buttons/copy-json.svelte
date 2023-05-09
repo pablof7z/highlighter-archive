@@ -12,4 +12,4 @@
 >
     <ViewIcon />
 </button>
-<Tooltip>Copy event JSON</Tooltip>
+<Tooltip  color="black">Copy event JSON</Tooltip>

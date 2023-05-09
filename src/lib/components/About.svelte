@@ -18,11 +18,11 @@
 <div class="text-xl flex flex-col gap-6 leading-relaxed sm:text-justify px-6 text-zinc-400">
     <p>Highlighter is a feed of a new kind of Nostr event:</p>
 
-    <p class="text-white font-semibold"><mark class="bg-orange-700 text-white rounded px-2 py-1">Highlights</mark></p>
+    <p class="text-black font-semibold"><mark class="bg-orange-700 text-black rounded px-2 py-1">Highlights</mark></p>
 
     <p>
         Think of it as a way of keeping
-        <span class="text-white">the words you find valuable running on Nostr</span>.
+        <span class="text-black">the words you find valuable running on Nostr</span>.
     </p>
 
     <p>
@@ -38,7 +38,7 @@
 
     <hr class="h-px mb-6 bg-gray-200 border-0 dark:bg-gray-700">
 
-    <h4 class="text-4xl text-white font-serif font-thin mt-4">
+    <h4 class="text-4xl text-black font-serif font-thin mt-4">
         Origin
     </h4>
 
@@ -67,7 +67,7 @@
         Oh. Wait. What's special about this quote?
     </p>
 
-    <p class="text-white">
+    <p class="text-black">
         Well, the quote itself, the highlight, it's a nostr event itself.
     </p>
 
@@ -80,7 +80,7 @@
         You can even ⚡️ zap it.
     </p>
 
-    <h4 class="text-4xl text-white font-serif font-thin mt-4">
+    <h4 class="text-4xl text-black font-serif font-thin mt-4">
         ⚡️ Splits
     </h4>
 
@@ -95,7 +95,7 @@
 
     <p>
         Author, publisher, curator, broadcaster.
-        <span class="text-white">Everyone that contributed to you reading
+        <span class="text-black">Everyone that contributed to you reading
         these words, receives a share of the splits.</span>
     </p>
 </div>

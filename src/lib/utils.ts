@@ -1,6 +1,12 @@
 
 import sanitizeHtml from 'sanitize-html';
 import MarkdownIt from 'markdown-it';
+import {nip19} from 'nostr-tools';
+
+export function idFromNaddr(naddr: string) {
+    const ndecode = nip19.decode(naddr).data as any;
+    return `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`;
+}
 
 export function prettifyContent(content: string) {
     const bitcoinImage = "<img src=\"https://abs.twimg.com/hashflags/Bitcoin_evergreen/Bitcoin_evergreen.png\" style=\"width: 1.2em; vertical-align: -20%; margin-right: 0.075em; height: 1.2em; margin-left: 2px; display: inline-block;\">";

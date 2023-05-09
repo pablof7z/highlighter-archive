@@ -32,7 +32,7 @@
     export let disableClick: boolean = false;
     let prevHighlightId: string | undefined = undefined;
 
-    let replies;
+    let replies, quotes;
     let articles, article: App.Article | undefined;
     let zaps;
     let zappedAmount: number;
@@ -46,6 +46,7 @@
     let copiedEventId = false;
     let highlightNoteId = '';
     let highlightUser = new NDKUser({hexpubkey: highlight.pubkey});
+    let niceTime: string;
 
     function copyId() {
         if (!highlightNoteId) return;
@@ -141,6 +142,7 @@
             showComments = false;
             showReplies = false;
             prevHighlightId = highlight.id;
+            niceTime = new Date(highlight.timestamp * 1000).toLocaleString();
 
             highlightNoteId = nip19.noteEncode(highlight.id);
 
@@ -168,6 +170,7 @@
             }
 
             replies = NoteInterface.load({ replies: [highlight.id] });
+            quotes = NoteInterface.load({ quotes: [highlight.id] });
             zaps = ZapInterface.load({eventId: highlight.id});
 
             if (highlight.articleId) {
@@ -178,7 +181,11 @@
         if ($articles) article = $articles[0];
 
         if (!event || event.id !== highlight.id) {
-            event = new NDKEvent($ndk, JSON.parse(highlight.event));
+            try {
+                event = new NDKEvent($ndk, JSON.parse(highlight.event));
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         // count zap amount
@@ -190,26 +197,24 @@
 
         pubkey = highlight.pubkey;
 
-        domain = new URL(highlight.url).hostname;
+        domain = highlight.url && new URL(highlight.url).hostname;
     }
 
 </script>
 
 <div class="flex flex-col gap-4">
     <div class="
+        rounded-md bg-white px-6 py-4 shadow
         flex flex-col h-full gap-4
-        border border-gray-950 hover:border-gray-900
-        p-8 pb-4 rounded-xl
-        bg-black hover:bg-gray-950
         transition duration-100
+        group
     " style="max-height: 40rem;">
 
         {#if !skipTitle}
             <!-- Title -->
-            <div class="flex flex-row justify-between items-start">
+            <div class="flex flex-row justify-between items-start relative">
                 <div class="flex flex-col gap-2">
                     <a href={articleLink} class="
-                        text-gray-600
                         font-bold text-2xl
                         font-sans
                     ">
@@ -218,7 +223,7 @@
                     {#if article?.author}
                         <div class="flex flex-row gap-4 items-start">
                             <Avatar pubkey={article.author} klass="h-8" />
-                            <div class=" text-gray-500 text-lg">
+                            <div class="text-lg">
                                 <Name pubkey={article.author} />
                             </div>
                         </div>
@@ -229,20 +234,38 @@
                     {/if}
                 </div>
 
-                <button class="text-gray-700 hover:text-gray-400 transition duration-300 w-fit"
-                    on:click={() => {
-                        navigator.clipboard.writeText(highlight.event);
-                    }}
-                >
-                    <ViewIcon />
-                </button>
-                <Tooltip>Copy event JSON</Tooltip>
+                <div class="
+                    flex flex-col gap-4 absolute -right-14
+                    opacity-0 group-hover:opacity-100 transition duration-300
+                ">
+                    <button class="text-gray-700 hover:text-gray-400 transition duration-300 w-fit"
+                        on:click={() => {
+                            navigator.clipboard.writeText(highlight.event);
+                        }}
+                    >
+                        <ViewIcon />
+                    </button>
+                    <Tooltip color="black">Copy event JSON</Tooltip>
+
+                    <button class="
+                        flex flex-row gap-2 items-center text-slate-500 hover:text-orange-500
+                    " on:click={copyId}>
+                        {#if copiedEventId}
+                            <CheckIcon />
+                        {:else}
+                            <CopyIcon />
+                        {/if}
+                    </button>
+                    <Tooltip  color="black">
+                        Copy highlight Nostr ID
+                    </Tooltip>
+                </div>
             </div>
         {/if}
 
         <!-- Content -->
         <a href={articleLink} on:click={onContentClick} class="
-            text-lg leading-relaxed text-gray-200 h-full flex flex-col
+            leading-relaxed h-full flex flex-col
             px-6 py-4
             my-2
             border-l border-slate-500
@@ -250,6 +273,14 @@
         ">
             {highlight.content}
         </a>
+
+        {#if $quotes}
+            {#each $quotes as quote}
+                <div class="text-lg">
+                    {quote.content.replace(/\nnostr:(.*)$/, '')}
+                </div>
+            {/each}
+        {/if}
 
         <!-- Footer -->
         <div class="
@@ -259,6 +290,7 @@
             w-full
             rounded-b-lg
             py-4 pb-0
+            relative
         ">
             <div class="flex flex-row gap-4 items-center whitespace-nowrap">
                 <a
@@ -269,7 +301,7 @@
                         <Name pubkey={highlight.pubkey} />
                     </div>
                 </a>
-                {#if ($replies||[]).length > 0}
+                <!-- {#if ($replies||[]).length > 0}
                     <button class="text-sm text-gray-500"
                         on:click={() => { showReplies = !showReplies }}
                     >
@@ -277,13 +309,28 @@
                             {($replies||[]).length} comments
                         </span>
                     </button>
-                    <Tooltip>
+                    <Tooltip  color="black">
                         View comments
                     </Tooltip>
-                {/if}
+                {/if} -->
             </div>
 
-            <div class="flex flex-row gap-4 items-center">
+            <div class="
+                absolute bottom-0 right-0
+                opacity-100 group-hover:opacity-0
+                transition duration-300
+                text-xs text-slate-500
+                z-0
+            ">
+                {niceTime}
+            </div>
+
+            <div class="
+                flex flex-row gap-4 items-center
+                opacity-0 group-hover:opacity-100
+                transition duration-300
+                z-10
+            ">
                 <BookmarkButton ndkEvent={event} />
 
                 <button class="
@@ -293,7 +340,7 @@
                     <ZapIcon />
                     {zappedAmount}
                 </button>
-                <Tooltip>Zap</Tooltip>
+                <Tooltip color="black">Zap</Tooltip>
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -301,7 +348,7 @@
                 " on:click={boost}>
                     <BoostIcon />
                 </button>
-                <Tooltip>Boost</Tooltip>
+                <Tooltip  color="black">Boost</Tooltip>
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -310,26 +357,13 @@
                     <CommentIcon />
                     {($replies||[]).length}
                 </button>
-                <Tooltip>Discuss</Tooltip>
+                <Tooltip  color="black">Discuss</Tooltip>
 
-                {#if highlight.articleId}
-                    <button class="
-                        flex flex-row gap-2 items-center text-slate-500 hover:text-orange-500
-                    " on:click={copyId}>
-                        {#if copiedEventId}
-                            <CheckIcon />
-                        {:else}
-                            <CopyIcon />
-                        {/if}
-                    </button>
-                    <Tooltip>
-                        Copy highlight Nostr ID
-                    </Tooltip>
-                {:else if highlight.url && !skipUrl}
+                {#if highlight.url && !skipUrl}
                     <a href={highlight.url} class="text-gray-500 hover:text-orange-500 flex flex-row gap-3 text-sm items-center">
                         {domain}
                     </a>
-                    <Tooltip>
+                    <Tooltip  color="black">
                         {highlight.url}
                     </Tooltip>
                 {/if}
@@ -340,7 +374,7 @@
                 ">
                     <LinkIcon />
                 </a>
-                <Tooltip>Link to this highlight</Tooltip>
+                <Tooltip  color="black">Link to this highlight</Tooltip>
             </div>
         </div>
 

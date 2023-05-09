@@ -8,13 +8,17 @@
     import { onDestroy, onMount } from "svelte";
     import type { NDKSubscription } from "@nostr-dev-kit/ndk";
 
-    export let filter: ILoadOpts;
+    export let items: Observable<App.Highlight[]> | undefined = undefined;
+    export let filter: ILoadOpts | undefined = undefined;
+
+    export let skipTitle: boolean = false;
     let subs: NDKSubscription[] = [];
-    let items: Observable<App.Highlight[]>;
 
     onMount(() => {
-		items = HighlightInterface.load(filter);
-		subs = HighlightInterface.startStream(filter);
+        if (filter) {
+            items = HighlightInterface.load(filter);
+            subs = HighlightInterface.startStream(filter);
+        }
 	});
 
     onDestroy(() => {
@@ -25,7 +29,7 @@
 <div class="grid grid-cols-1 gap-8">
     {#if $items}
         {#each $items as item}
-            <HighlightListItem highlight={item} disableClick={true} />
+            <HighlightListItem highlight={item} disableClick={true} {skipTitle} />
         {/each}
     {/if}
 </div>

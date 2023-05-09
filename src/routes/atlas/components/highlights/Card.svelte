@@ -202,6 +202,12 @@
     }
 </script>
 
+{#if article}
+{JSON.stringify(article)}
+{:else}
+nope
+{/if}
+
 <div
     class="flex flex-col h-full"
     draggable={true}
@@ -242,7 +248,7 @@
                 >
                     <ViewIcon />
                 </button>
-                <Tooltip>Copy event JSON</Tooltip>
+                <Tooltip  color="black">Copy event JSON</Tooltip>
             </div>
         {/if}
 
@@ -280,7 +286,7 @@
                             {($replies||[]).length} comments
                         </span>
                     </button>
-                    <Tooltip>
+                    <Tooltip  color="black">
                         View comments
                     </Tooltip>
                 {/if}
@@ -291,7 +297,7 @@
                     class="text-slate-500 hover:text-purple-700"
                     on:click={() => { openModal(BookmarkModal, { event: highlight.event }) }}
                 ><BookmarkIcon /></button>
-                <Tooltip>Bookmark</Tooltip>
+                <Tooltip  color="black">Bookmark</Tooltip>
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -300,7 +306,7 @@
                     <ZapIcon />
                     {zappedAmount}
                 </button>
-                <Tooltip>Zap</Tooltip>
+                <Tooltip  color="black">Zap</Tooltip>
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -308,7 +314,7 @@
                 " on:click={boost}>
                     <BoostIcon />
                 </button>
-                <Tooltip>Boost</Tooltip>
+                <Tooltip  color="black">Boost</Tooltip>
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -317,7 +323,7 @@
                     <CommentIcon />
                     {($replies||[]).length}
                 </button>
-                <Tooltip>Discuss</Tooltip>
+                <Tooltip  color="black">Discuss</Tooltip>
 
                 {#if highlight.articleId}
                     <button class="
@@ -329,14 +335,14 @@
                             <CopyIcon />
                         {/if}
                     </button>
-                    <Tooltip>
+                    <Tooltip  color="black">
                         Copy highlight Nostr ID
                     </Tooltip>
                 {:else if highlight.url && !skipUrl}
                     <a href={highlight.url} class="text-gray-500 hover:text-orange-500 flex flex-row gap-3 text-sm items-center">
                         {domain}
                     </a>
-                    <Tooltip>
+                    <Tooltip  color="black">
                         {highlight.url}
                     </Tooltip>
                 {/if}
@@ -347,7 +353,7 @@
                 ">
                     <LinkIcon />
                 </a>
-                <Tooltip>Link to this highlight</Tooltip>
+                <Tooltip  color="black">Link to this highlight</Tooltip>
             </div>
         </div>
 

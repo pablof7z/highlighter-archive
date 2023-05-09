@@ -11,14 +11,14 @@ export class Database extends Dexie {
 
     constructor() {
         super('highlighter');
-        this.version(24).stores({
+        this.version(28).stores({
             articles: '++id, url, publisher, content, author, event, title',
             bookmarkLists: '++id, pubkey, title',
             highlights: '++id, url, pubkey, boostedBy, event, content, articleId, timestamp',
             encryptedNotes: '++id, pubkey, event, encryptedContent',
-            notes: '++id, url, pubkey, replyToArticleId, replyToEventId, event, content, createdAt',
+            notes: '++id, url, pubkey, replyToArticleId, replyToEventId, quotesEventId, event, content, createdAt',
             users: '++id, name, displayName, image, banner, bio, nip05, lud16, about, zapService, event',
-            zaps: '++id, zapper, zappee, zapped, zappedEvent, amount, comment, event'
+            zaps: '++id, zapper, zappee, zapped, zappedEvent, amount, comment, event, zappedEventKind'
         });
     }
 }

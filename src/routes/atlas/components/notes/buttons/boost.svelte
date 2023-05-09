@@ -39,4 +39,4 @@
 " on:click={boost}>
     <BoostIcon />
 </button>
-<Tooltip>Boost</Tooltip>
+<Tooltip  color="black">Boost</Tooltip>

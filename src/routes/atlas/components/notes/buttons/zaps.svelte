@@ -9,13 +9,16 @@
     import ZapModal from '$lib/modals/Zap.svelte';
     import { onMount } from 'svelte';
 
-    export let note: App.Note;
+    export let note: App.Note | undefined = undefined;
+    export let highlight: App.Highlight | undefined = undefined;
+
+    let eventId = note?.id || highlight?.id;
 
     let zappedAmount: number = 0;
     let zaps;
 
     onMount(() => {
-        zaps = ZapInterface.load({eventId: note.id});
+        zaps = ZapInterface.load({eventId});
     });
 
     if ($zaps) {
@@ -28,8 +31,8 @@
 <button class="
     text-slate-500 hover:text-orange-500
     flex flex-row items-center gap-2
-" on:click={() => { openModal(ZapModal, { note }) }}>
+" on:click={() => { openModal(ZapModal, { note, highlight }) }}>
     <ZapIcon />
     {zappedAmount}
 </button>
-<Tooltip>Zap</Tooltip>
+<Tooltip  color="black">Zap</Tooltip>
