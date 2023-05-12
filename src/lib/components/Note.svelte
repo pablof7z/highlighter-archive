@@ -47,19 +47,19 @@
     Loading {noteId}
 {:else}
     <div class="
-        border border-zinc-800 rounded-lg
-        bg-zinc-900
+        rounded-lg
+        bg-white shadow
     ">
         <div class="flex flex-col items-center">
             <div class="flex flex-row gap-4 w-full px-4 pt-4 items-center">
                 <Avatar pubkey={_note.pubkey} klass="h-8" />
 
-                <div class="text-normal text-zinc-400 font-normal">
+                <div class="text-normal font-normal">
                     <Name pubkey={_note.pubkey} />
                 </div>
             </div>
 
-            <div class="text-normal text-zinc-300 p-4 w-full flex-grow">
+            <div class="text-normal p-4 w-full flex-grow">
                 <FormattedContent
                     note={_note.content}
                     tags={_note.tags}

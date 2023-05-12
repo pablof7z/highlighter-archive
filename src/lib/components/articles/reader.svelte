@@ -10,7 +10,7 @@
     import ScopeDropdown from '$lib/components/ScopeDropdown.svelte';
     import HighlightList from '$lib/components/HighlightList.svelte';
     import HighlightListItemForm from '$lib/components/HighlightListItemForm.svelte';
-    import { currentUser, currentUserFollowPubkeys } from '$lib/store';
+    import { currentUser, currentUserFollowPubkeys, currentScope } from '$lib/store';
     import ndk from "$lib/stores/ndk";
     import HighlightWrapper from '$lib/components/HighlightWrapper.svelte';
     import { fade } from 'svelte/transition';
@@ -28,8 +28,7 @@
         notes = NoteInterface.load({articleId});
     }
 
-    let scope = 'personal';
-    let currentScope: string;
+    let scope = $currentScope.label;
 
     let highlightFilter: any;
     let currentHighlightFilter: any;
@@ -40,7 +39,7 @@
     let activeSub: NDKSubscription[] | undefined;
 
     // Set filter for current view
-    $: if (scope !== currentScope) {
+    $: if (scope !== currentScope.label) {
         let pubkeys: string[] | undefined | null = null;
 
         if (scope === 'network') {
@@ -60,7 +59,6 @@
         // If pubkeys has been explicitly set to a value or undefined
         if (pubkeys !== null) {
             highlightFilter = {pubkeys, articleId};
-            currentScope = scope;
         }
     }
 
@@ -131,7 +129,7 @@
 
 <div class="flex flex-row sm:flex-row w-full mx-auto px-6">
     <div class="
-        rounded-b-lg shadow-sm
+        rounded-b-lg shadow
         text-lg p-8 text-justify leading-loose flex flex-col gap-2
         bg-white rounded-xl w-7/12
         overflow-auto

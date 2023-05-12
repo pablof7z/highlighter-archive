@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { currentUser, currentUserFollowPubkeys } from '$lib/store';
+    import { currentUserFollowPubkeys, currentScope } from '$lib/store';
     import { page } from "$app/stores";
 
     import Newest from './newest.svelte';
     import Highlights from './highlights.svelte';
-    import type { NDKUser } from '@nostr-dev-kit/ndk';
     import { fetchFollowers } from '$lib/currentUser';
 
     let { scope, ordering } = $page.params;

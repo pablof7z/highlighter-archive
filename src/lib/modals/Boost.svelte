@@ -54,6 +54,7 @@
                     {highlight}
                     {article}
                     skipTitle={true}
+                    skipButtons={true}
                 />
             </div>
 

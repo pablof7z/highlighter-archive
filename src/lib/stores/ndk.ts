@@ -8,7 +8,7 @@ const ndk = writable(new NDK({
     explicitRelayUrls: [
         // 'wss://purplepag.es',
         'ws://localhost:8080',
-        // 'wss://nos.lol',
+        'wss://nos.lol',
         // 'wss://relay.f7z.io',
         // 'wss://relay.damus.io',
         // 'wss://nostr.mom',

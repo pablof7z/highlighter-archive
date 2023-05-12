@@ -25,6 +25,7 @@
     export let highlight: App.Highlight;
     export let skipUrl: boolean = false;
     export let skipTitle: boolean = false;
+    export let skipButtons: boolean = false;
     export let disableClick: boolean = false;
     let prevHighlightId: string | undefined = undefined;
 
@@ -103,8 +104,10 @@
                 }
             }
 
-            replies = NoteInterface.load({ replies: [highlight.id] });
-            quotes = NoteInterface.load({ quotes: [highlight.id] });
+            const pubkeyFilter = {}; // XXX filter by selected pubkeys
+
+            replies = NoteInterface.load({ replies: [highlight.id], ...pubkeyFilter });
+            quotes = NoteInterface.load({ quotes: [highlight.id], ...pubkeyFilter });
         }
 
         if (!event || event.id !== highlight.id) {
@@ -186,12 +189,13 @@
         <!-- Content -->
         <a href={articleLink} on:click={onContentClick} class="
             leading-relaxed h-full flex flex-col
-            px-6 py-4
+            py-4
             my-2
-            border-l border-slate-500
             overflow-auto
         ">
-            {highlight.content}
+            <div class="border-l-2 border-orange-300 pl-4">
+                {highlight.content}
+            </div>
         </a>
 
         {#if $quotes}
@@ -225,7 +229,8 @@
 
             <div class="
                 absolute bottom-0 right-0
-                opacity-100 group-hover:opacity-0
+                opacity-100
+                {!skipButtons ? 'group-hover:opacity-0' : ''}
                 transition duration-300
                 text-xs text-slate-500
                 z-0
@@ -233,44 +238,46 @@
                 {niceTime}
             </div>
 
-            <div class="
-                flex flex-row gap-4 items-center
-                opacity-0 group-hover:opacity-100
-                transition duration-300
-                z-10
-            ">
-                <BookmarkButton {event} />
-
-                <ZapsButton {highlight} />
-
-                <BoostButton {highlight} {event} />
-
-                <button class="
-                    text-slate-500 hover:text-orange-500
-                    flex flex-row items-center gap-2
-                " on:click={() => { showComments = !showComments; showReplies = showComments; }}>
-                    <CommentIcon />
-                    {($replies||[]).length}
-                </button>
-                <Tooltip  color="black">Discuss</Tooltip>
-
-                {#if highlight.url && !skipUrl}
-                    <a href={highlight.url} class="text-gray-500 hover:text-orange-500 flex flex-row gap-3 text-sm items-center">
-                        {domain}
-                    </a>
-                    <Tooltip  color="black">
-                        {highlight.url}
-                    </Tooltip>
-                {/if}
-
-                <a href={`/e/${highlightNoteId}`} class="
-                    text-slate-500 hover:text-orange-500
-                    flex flex-row items-center gap-2
+            {#if !skipButtons}
+                <div class="
+                    flex flex-row gap-4 items-center
+                    opacity-0 group-hover:opacity-100
+                    transition duration-300
+                    z-10
                 ">
-                    <LinkIcon />
-                </a>
-                <Tooltip  color="black">Link to this highlight</Tooltip>
-            </div>
+                    <BookmarkButton {event} />
+
+                    <ZapsButton {highlight} />
+
+                    <BoostButton {highlight} {event} />
+
+                    <button class="
+                        text-slate-500 hover:text-orange-500
+                        flex flex-row items-center gap-2
+                    " on:click={() => { showComments = !showComments; showReplies = showComments; }}>
+                        <CommentIcon />
+                        {($replies||[]).length}
+                    </button>
+                    <Tooltip color="black">Discuss</Tooltip>
+
+                    {#if !highlight.articleId && highlight.url && !skipUrl}
+                        <a href={highlight.url} class="text-gray-500 hover:text-orange-500 flex flex-row gap-3 text-sm items-center">
+                            {domain}
+                        </a>
+                        <Tooltip  color="black">
+                            {highlight.url}
+                        </Tooltip>
+                    {/if}
+
+                    <a href={`/e/${highlightNoteId}`} class="
+                        text-slate-500 hover:text-orange-500
+                        flex flex-row items-center gap-2
+                    ">
+                        <LinkIcon />
+                    </a>
+                    <Tooltip color="black">Link to this highlight</Tooltip>
+                </div>
+            {/if}
         </div>
 
         <div class={(showComments ? `block` : 'hidden') + " w-full text-gray-200 text-lg"}>

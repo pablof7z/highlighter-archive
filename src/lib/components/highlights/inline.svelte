@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BoostButton from '$lib/components/events/buttons/boost.svelte';
+	import BookmarkButton from '$lib/components/events/buttons/bookmark.svelte';
     import Zaps from "../events/buttons/zaps.svelte";
     import Name from "../Name.svelte";
     import Avatar from "../Avatar.svelte";
@@ -30,7 +32,11 @@
 
 <li class="px-4 py-4 sm:px-0 group relative">
     <div class="flex flex-col gap-4">
-        <div>
+        <div class="
+            border-l-2 border-zinc-500
+            py-6
+            pl-4
+        ">
             <HighlightContent {highlight} />
         </div>
 
@@ -54,11 +60,13 @@
                 opacity-0 group-hover:opacity-100
                 {!skipHighlighter ? '' : "bg-white px-4 py-2 rounded-lg shadow-md" }
             ">
-                <button
-                    class="text-slate-500 hover:text-purple-700"
-                    on:click={() => { openModal(BookmarkModal, { event: highlightEvent }) }}
-                ><BookmarkIcon /></button>
-                <Tooltip  color="black">Bookmark</Tooltip>
+                <BoostButton
+                    event={highlightEvent}
+                    {highlight}
+                />
+                <BookmarkButton
+                    event={highlightEvent}
+                />
 
                 <button class="
                     text-slate-500 hover:text-orange-500
@@ -77,7 +85,7 @@
                 ">
                     <LinkIcon />
                 </a>
-                <Tooltip  color="black">Link to this highlight</Tooltip>
+                <Tooltip color="black">Link to this highlight</Tooltip>
             </div>
         </div>
     </div>

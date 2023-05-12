@@ -31,6 +31,7 @@
 		"vite": "^4.2.0"
 	},
 	"type": "module",
+	"license": "MIT+CC",
 	"dependencies": {
 		"@bytemd/plugin-gfm": "^1.21.0",
 		"@mozilla/readability": "^0.4.4",
