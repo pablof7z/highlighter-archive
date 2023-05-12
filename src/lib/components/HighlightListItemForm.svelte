@@ -1,10 +1,14 @@
 <script lang="ts">
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
+
+    import ClickToAddComment from './ClickToAddComment.svelte';
+
     import { ndk } from '$lib/store';
     import { NDKEvent, NDKRelaySet, NDKUser, type NostrEvent } from '@nostr-dev-kit/ndk';
     import RoundedButton from '../../routes/(main)/components/RoundedButton.svelte';
     import { createEventDispatcher } from 'svelte';
+
 
     export let highlight: App.Highlight;
     export let disableClick: boolean = false;
@@ -64,7 +68,6 @@
         }
     }
 
-    let addComment = false;
     let comment = '';
 </script>
 
@@ -87,23 +90,7 @@
         </div>
 
         <!-- Comment -->
-        {#if !addComment}
-            <button class="text-base text-zinc-400 text-left" on:click={() => {addComment = true}}>
-                Click to add some thoughts
-            </button>
-        {:else}
-            <div class="relative">
-                <textarea rows="5" autofocus class="
-                    rounded-lg shadow
-                    block w-full resize-none border-1 border-zinc-200 bg-transparent py-1.5
-                    text-gray-600 placeholder:text-gray-400 focus:ring-0 sm:leading-6
-                " bind:value={comment}
-                placeholder="Your thoughts"></textarea>
-                <button class="
-                    absolute bottom-1 left-2 text-xs text-gray-400 text-left p-0
-                " on:click={()=>{addComment = false;}}>cancel</button>
-            </div>
-        {/if}
+        <ClickToAddComment bind:value={comment} />
 
         <!-- Footer -->
         <div class="

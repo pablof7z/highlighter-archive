@@ -3,9 +3,10 @@
     import NoteInterface from '$lib/interfaces/notes';
     import NoteContent from './content.svelte';
     import Bookmark from '$lib/components/events/buttons/bookmark.svelte';
-    import Zaps from './buttons/zaps.svelte';
-    import Boost from './buttons/boost.svelte';
+    import Zaps from '$lib/components/events/buttons/zaps.svelte';
+    import Boost from '$lib/components/events/buttons/boost.svelte';
 
+    import ViewIcon from '$lib/icons/View.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
 
@@ -19,7 +20,6 @@
     import Comment from '$lib/components/Comment.svelte';
 
     export let note: App.Note;
-    export let skipFooter = false;
     export let skipHeader = false;
     export let compact = false;
     let prevNoteId: string | undefined = undefined;
@@ -93,8 +93,7 @@
     }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="relative flex flex-row w-full group" on:click={toggleCompactView}>
+<div class="relative flex flex-row w-full group">
     <div
         class="flex flex-col h-full flex-grow"
         draggable={true}
@@ -154,7 +153,7 @@
                         {/if}
                     </div>
 
-                    <div class="flex flex-row gap-4 items-center">
+                    <div class="flex flex-row gap-4 items-center" on:click|stopPropagation>
                         <Bookmark {event}  />
                         <Zaps {note}  />
                         <Boost {note}  />
@@ -184,14 +183,16 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-6 pt-6 ml-6 {showReplies ? 'block' : 'hidden'}">
-            {#each ($replies||[]) as reply}
-                <svelte:self note={reply} />
-            {/each}
-        </div>
+        {#if ($replies||[]).length > 0}
+            <div class="flex flex-col gap-6 pt-6 ml-6 {showReplies ? 'block' : 'hidden'}">
+                {#each ($replies||[]) as reply}
+                    <svelte:self note={reply} />
+                {/each}
+            </div>
+        {/if}
     </div>
 
-    {#if skipHeader}
+    {#if skipHeader && showCompact}
         <div class="
             absolute top-4 right-4 text-xs text-zinc-400
             opacity-0 group-hover:opacity-100
@@ -203,10 +204,18 @@
 
     <div class="
         absolute
-        -right-14
+        flex flex-col gap-2
+        p-2 px-2
+        top-0 -right-16
         text-gray-200 group-hover:text-gray-600 transition duration-300
     ">
-        <CopyJson {note} />
+        {#if showCompact}
+            <button on:click={toggleCompactView}>
+                <ViewIcon />
+            </button>
+        {:else}
+            <CopyJson {note} />
+        {/if}
         <button class="
             {($replies||[]).length > 0 ? 'text-gray-600' : ''}
             flex flex-row items-center gap-2

@@ -90,7 +90,7 @@ async function handleEvent30001(event: NDKEvent) {
     const bookmarkList: App.BookmarkList = {
         id: event.tagId(),
         pubkey: event.pubkey,
-        createdAt: event.created_at! / 1000,
+        createdAt: event.created_at!,
         naddr: event.encode(),
         title,
         description,

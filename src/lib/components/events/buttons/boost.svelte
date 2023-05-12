@@ -6,21 +6,28 @@
     import { ndk } from '$lib/store';
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
 
-    export let note: App.Note;
+    import { openModal } from 'svelte-modals'
+    import BoostModal from '$lib/modals/Boost.svelte';
+
+    export let event: NDKEvent;
+    export let note: App.Note | undefined = undefined;
+    export let highlight: App.Highlight | undefined = undefined;
+
+    let eventJSON = note?.event || highlight?.event;
 
     async function boost() {
-        let noteEvent = new NDKEvent($ndk, JSON.parse(note.event));
+        event = new NDKEvent($ndk, JSON.parse(eventJSON!));
 
         const tags = [];
-        tags.push(noteEvent.tagReference());
+        tags.push(event.tagReference());
 
-        const pTag = noteEvent.getMatchingTags('p')[0];
+        const pTag = event.getMatchingTags('p')[0];
         if (pTag && pTag[1]) {
             tags.push(['p', pTag[1], "highlighter"]);
         }
 
         const boostEvent = new NDKEvent($ndk, {
-            content: JSON.stringify(noteEvent.rawEvent()),
+            content: JSON.stringify(event.rawEvent()),
             created_at: Math.floor(Date.now() / 1000),
             kind: 6,
             tags,
@@ -36,7 +43,7 @@
 <button class="
     text-slate-500 hover:text-orange-500
     flex flex-row items-center gap-2
-" on:click={boost}>
+" on:click={() => { openModal(BoostModal, { event, highlight }) }}>
     <BoostIcon />
 </button>
 <Tooltip  color="black">Boost</Tooltip>

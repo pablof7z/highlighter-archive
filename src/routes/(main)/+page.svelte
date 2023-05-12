@@ -31,7 +31,7 @@
             </div>
 
             <div>
-                <RoundedButton>Start Highlighting</RoundedButton>
+                <RoundedButton href="/network/highlights">Start Highlighting</RoundedButton>
             </div>
         </div>
 

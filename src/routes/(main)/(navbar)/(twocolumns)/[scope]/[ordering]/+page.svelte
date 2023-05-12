@@ -5,6 +5,7 @@
     import Newest from './newest.svelte';
     import Highlights from './highlights.svelte';
     import type { NDKUser } from '@nostr-dev-kit/ndk';
+    import { fetchFollowers } from '$lib/currentUser';
 
     let { scope, ordering } = $page.params;
     let followsPromise: Promise<boolean> | undefined = undefined;
@@ -12,20 +13,6 @@
     $: {
         scope = $page.params.scope;
         ordering = $page.params.ordering;
-    }
-
-    function fetchFollowers() {
-        if (!$currentUser) {
-            setTimeout(fetchFollowers, 1000);
-            return;
-        }
-
-        followsPromise = new Promise((resolve, reject) => {
-            $currentUser?.follows().then((follows) => {
-                $currentUserFollowPubkeys = Array.from(follows).map((u: NDKUser) => u.hexpubkey());
-                resolve(true);
-            });
-        });
     }
 
     $: if (scope === 'network') {

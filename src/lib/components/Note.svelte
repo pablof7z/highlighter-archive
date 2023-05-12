@@ -36,7 +36,6 @@
 
     $: if ($noteQuery && !_note !== $noteQuery[0]) {
         _note = $noteQuery[0];
-        console.log('setting it', $noteQuery[0]);
     }
 
     $: if (!event && note) {

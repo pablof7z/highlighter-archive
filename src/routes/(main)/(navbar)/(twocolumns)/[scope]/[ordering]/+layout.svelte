@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import ScopeDropdown from '../../../../components/ScopeDropdown.svelte';
+    import ScopeDropdown from '$lib/components/ScopeDropdown.svelte';
 
     let {scope, ordering } = $page.params;
 
@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex flex-row justify-between">
-    <nav class="flex space-x-4" aria-label="Tabs">
+    <nav class="flex flex-row space-x-4">
         <!-- Current: "bg-zinc-100 text-zinc-700", Default: "text-zinc-500 hover:text-zinc-700" -->
         <a href="/{scope}/newest" class="
             text-zinc-500 hover:text-zinc-700 rounded-md px-3 py-2 text-sm font-medium
@@ -26,12 +26,12 @@
             Most Highlighted
         </a>
         <a href="#" on:click|preventDefault={()=>{}} class="
-            text-zinc-400 cursor-default hsover:text-zinc-700 rounded-md px-3 py-2 text-sm font-medium
+            hidden sm:block text-zinc-400 cursor-default hsover:text-zinc-700 rounded-md px-3 py-2 text-sm font-medium
         ">
             Most Discussed
         </a>
         <a href="/network/highlights" on:click|preventDefault={()=>{}} class="
-            text-zinc-400 cursor-default hsover:text-zinc-700 rounded-md px-3 py-2 text-sm font-medium
+            hidden sm:block text-zinc-400 cursor-default hsover:text-zinc-700 rounded-md px-3 py-2 text-sm font-medium
         ">
             Most Zapped
         </a>

@@ -22,7 +22,7 @@
                 break;
         }
 
-        filter = { pubkeys, sortBy: 'timestamp', limit: 5 };
+        filter = { pubkeys, sortBy: 'timestamp', limit: 100 };
     }
 </script>
 

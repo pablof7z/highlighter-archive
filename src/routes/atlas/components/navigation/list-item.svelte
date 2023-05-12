@@ -91,7 +91,7 @@
             {hover ? 'bg-gray-100' : ''}
         "
     >
-        <NavigationButton route="/atlas/bookmarks/{list.naddr}">
+        <NavigationButton route="/atlas/lists/{list.naddr}">
             <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border text-[0.625rem] font-medium bg-white text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600">{list.title.slice(0,1)}</span>
                 <span class="truncate">{list.title}</span>
         </NavigationButton>

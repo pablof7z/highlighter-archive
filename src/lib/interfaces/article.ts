@@ -42,8 +42,6 @@ const ArticleInterface = {
 
         const ndk: NDK = getStore(ndkStore);
 
-        console.log(`subscribing to ${JSON.stringify(filter)}`);
-
         const subs = ndk.subscribe(filter);
 
         subs.on('event', async (event: NDKEvent) => {
@@ -76,6 +74,8 @@ const ArticleInterface = {
             return liveQuery(() =>
                 db.articles.where({id: queryId}).toArray()
             );
+        } else {
+            console.error('not know how to reply to article load', opts);
         }
     },
 };

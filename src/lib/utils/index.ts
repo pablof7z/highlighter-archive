@@ -2,6 +2,17 @@
 import sanitizeHtml from 'sanitize-html';
 import MarkdownIt from 'markdown-it';
 import {nip19} from 'nostr-tools';
+import type { NDKFilter } from '@nostr-dev-kit/ndk';
+
+export function filterFromNaddr(naddr: string): NDKFilter {
+    const ndecode = nip19.decode(naddr).data as any;
+
+    return {
+        kinds: [ndecode.kind],
+        authors: [ndecode.pubkey],
+        "#d": [ndecode.identifier],
+    }
+}
 
 export function idFromNaddr(naddr: string) {
     const ndecode = nip19.decode(naddr).data as any;

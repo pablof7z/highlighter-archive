@@ -1,8 +1,4 @@
 <script lang="ts">
-    import MyHighlightsIcon from '$lib/icons/MyHighlights.svelte';
-    import GlobalIcon from '$lib/icons/Global.svelte';
-    import FollowsIcon from '$lib/icons/Follows.svelte';
-	import RadioButton from '$lib/components/buttons/radio.svelte';
 	import Highlight from '$lib/components/HighlightListItem.svelte';
     import { page } from '$app/stores';
     import { fetchArticle } from '$lib/article';
@@ -10,12 +6,11 @@
     import HighlightInterface from '$lib/interfaces/highlights';
     import NoteInterface from '$lib/interfaces/notes';
     import { onMount } from 'svelte';
-    import { Tooltip } from 'flowbite-svelte';
-    import Widget from '../../../Widget.svelte';
+    import Widget from '../../../../Widget.svelte';
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
     import Article from '$lib/components/Article.svelte';
-    import { NDKUser } from '@nostr-dev-kit/ndk';
+    import { NDKSubscription, NDKUser } from '@nostr-dev-kit/ndk';
 
     let url = $page.url.searchParams.get('url') || '';
     let author = $page.url.searchParams.get('author') || '';
@@ -57,11 +52,10 @@
 
         try {
             article = await fetchArticle(url);
+            content = article.content;
         } catch (error: any) {
             fetchError = error.message;
         }
-
-        content = article.content;
     }
 
     onMount(async () => {

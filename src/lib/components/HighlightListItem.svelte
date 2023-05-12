@@ -1,20 +1,17 @@
 <script lang="ts">
     import NoteInterface from '$lib/interfaces/notes';
-    import ArticleInterface from '$lib/interfaces/article';
-    import ZapInterface from '$lib/interfaces/zap';
 
     import CopyIcon from '$lib/icons/Copy.svelte';
     import CheckIcon from '$lib/icons/Check.svelte';
-    import BoostIcon from '$lib/icons/Boost.svelte';
     import ViewIcon from '$lib/icons/View.svelte';
-    import ZapIcon from '$lib/icons/Zap.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
 
-    import { openModal } from 'svelte-modals'
     import { Tooltip } from 'flowbite-svelte';
 
     import BookmarkButton from '$lib/components/events/buttons/bookmark.svelte';
+    import ZapsButton from '$lib/components/events/buttons/zaps.svelte';
+    import BoostButton from '$lib/components/events/buttons/boost.svelte';
 
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
@@ -23,9 +20,8 @@
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';
     import Note from '$lib/components/Note.svelte';
-    import ZapModal from '$lib/modals/Zap.svelte';
-    import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
 
+    export let article: App.Article | undefined = undefined;
     export let highlight: App.Highlight;
     export let skipUrl: boolean = false;
     export let skipTitle: boolean = false;
@@ -33,9 +29,6 @@
     let prevHighlightId: string | undefined = undefined;
 
     let replies, quotes;
-    let articles, article: App.Article | undefined;
-    let zaps;
-    let zappedAmount: number;
     let domain: string;
     let pubkey: string;
     let showComments = false;
@@ -55,64 +48,6 @@
         setTimeout(() => {
             copiedEventId = false;
         }, 1500);
-    }
-
-    async function boost() {
-        let highlightEvent = new NDKEvent($ndk, JSON.parse(highlight.event));
-        let articleEvent;
-
-        const tags = [];
-        tags.push(highlightEvent.tagReference());
-
-        const pTag = highlightEvent.getMatchingTags('p')[0];
-        if (pTag && pTag[1]) {
-            tags.push(['p', pTag[1], "highlighter"]);
-        }
-
-        if (article) {
-            try {
-                articleEvent = new NDKEvent($ndk, JSON.parse(article.event));
-                tags.push(articleEvent.tagReference());
-
-                // should this be checking for the pubkey of the article event as the publisher?
-                // then for `p` tags marked as a `author` for the author instead?
-                // then we would need to change how nip-23s are generated to include the `p` author tag
-                // why didn't I use the `p` tag at first for this?
-                const pTag = articleEvent.getMatchingTags('p')[0];
-                if (pTag && pTag[1]) {
-                    tags.push(['p', pTag[1], "author"]);
-                } else {
-
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        } else {
-            // check if this highlightEvent has an `r` tag
-            const rTag = highlightEvent.getMatchingTags('r')[0];
-
-            if (rTag && rTag[1]) {
-                tags.push(['r', rTag[1]]);
-            } else {
-                console.error('no article found for this highlight');
-            }
-        }
-
-        // tag the kind so we can find it later
-        tags.push(['k', highlightEvent.kind?.toString()]);
-
-        const boostEvent = new NDKEvent($ndk, {
-            content: JSON.stringify(highlightEvent.rawEvent()),
-            created_at: Math.floor(Date.now() / 1000),
-            kind: 6,
-            tags,
-        } as NostrEvent);
-
-        await boostEvent.sign();
-        console.log('boostEvent', await boostEvent.toNostrEvent());
-        await boostEvent.publish();
-
-        alert('event boosted; displaying boosts is WIP -- BRB! 😉')
     }
 
     function onContentClick(e) {
@@ -138,7 +73,6 @@
 
     $: {
         if (prevHighlightId !== highlight.id && highlight.id) {
-            article = undefined;
             showComments = false;
             showReplies = false;
             prevHighlightId = highlight.id;
@@ -171,14 +105,7 @@
 
             replies = NoteInterface.load({ replies: [highlight.id] });
             quotes = NoteInterface.load({ quotes: [highlight.id] });
-            zaps = ZapInterface.load({eventId: highlight.id});
-
-            if (highlight.articleId) {
-                articles = ArticleInterface.load({ id: highlight.articleId });
-            }
         }
-
-        if ($articles) article = $articles[0];
 
         if (!event || event.id !== highlight.id) {
             try {
@@ -186,13 +113,6 @@
             } catch (e) {
                 console.error(e);
             }
-        }
-
-        // count zap amount
-        if ($zaps) {
-            zappedAmount = $zaps.reduce((acc, zap) => {
-                return acc + zap.amount;
-            }, 0);
         }
 
         pubkey = highlight.pubkey;
@@ -301,18 +221,6 @@
                         <Name pubkey={highlight.pubkey} />
                     </div>
                 </a>
-                <!-- {#if ($replies||[]).length > 0}
-                    <button class="text-sm text-gray-500"
-                        on:click={() => { showReplies = !showReplies }}
-                    >
-                        <span class=" px-4 py-2 rounded-xl flex flex-col items-center justify-center text-xs">
-                            {($replies||[]).length} comments
-                        </span>
-                    </button>
-                    <Tooltip  color="black">
-                        View comments
-                    </Tooltip>
-                {/if} -->
             </div>
 
             <div class="
@@ -331,24 +239,11 @@
                 transition duration-300
                 z-10
             ">
-                <BookmarkButton ndkEvent={event} />
+                <BookmarkButton {event} />
 
-                <button class="
-                    text-slate-500 hover:text-orange-500
-                    flex flex-row items-center gap-2
-                " on:click={() => { openModal(ZapModal, { highlight, article }) }}>
-                    <ZapIcon />
-                    {zappedAmount}
-                </button>
-                <Tooltip color="black">Zap</Tooltip>
+                <ZapsButton {highlight} />
 
-                <button class="
-                    text-slate-500 hover:text-orange-500
-                    flex flex-row items-center gap-2
-                " on:click={boost}>
-                    <BoostIcon />
-                </button>
-                <Tooltip  color="black">Boost</Tooltip>
+                <BoostButton {highlight} {event} />
 
                 <button class="
                     text-slate-500 hover:text-orange-500

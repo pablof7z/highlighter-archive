@@ -151,6 +151,7 @@
             }
         }
 
+        listEvent.created_at = Math.floor(Date.now() / 1000);
         listEvent.tags.push(tag);
         await listEvent.sign();
         await listEvent.publish();
@@ -237,7 +238,7 @@
             await listEvent.encrypt($currentUser!);
         }
 
-
+        listEvent.created_at = Math.floor(Date.now() / 1000);
         await listEvent.sign();
         await listEvent.publish();
 
@@ -246,13 +247,11 @@
     }
 </script>
 
-{JSON.stringify(listEvent?.tags)}
-
 {#if listEvent}
     <div class="flex flex-col gap-8">
         <!-- Header -->
         <PageTitle
-            title={bookmarkList?.title}
+            title={bookmarkList?.title||"Untitled"}
             subtitle={bookmarkList?.description}
         />
 
@@ -302,13 +301,13 @@
                 {/if}
             </div>
 
-            {#if encryptedTags}
+            {#if encryptedTags && encryptedTags.length > 0}
+                Secret (encrypted)
                 <Tags tags={encryptedTags} kind={4} {currentUserPubkeys} />
             {/if}
 
+            Public
             <Tags tags={tags} {currentUserPubkeys} />
-            {currentUserPubkeys}
-
         </div>
     </div>
 {/if}

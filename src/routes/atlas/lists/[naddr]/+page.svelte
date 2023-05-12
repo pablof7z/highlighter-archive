@@ -9,4 +9,6 @@
     }
 </script>
 
-<List {naddr} />
+{#key naddr}
+    <List {naddr} />
+{/key}

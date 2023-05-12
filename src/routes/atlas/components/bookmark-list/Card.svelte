@@ -2,7 +2,7 @@
     export let bookmarkList: App.BookmarkList;
 </script>
 
-<a href="/atlas/bookmarks/{bookmarkList.naddr}" class="flex flex-col">
+<a href="/atlas/lists/{bookmarkList.naddr}" class="flex flex-col">
     <div class="
         shadow
         flex flex-col h-full gap-4
@@ -15,7 +15,7 @@
                 {bookmarkList.title}
             </div>
             <div class="flex flex-row gap-4 items-start text-sm text-zinc-400">
-                {new Date(bookmarkList.createdAt).toLocaleString()}
+                {new Date(bookmarkList.createdAt * 1000).toLocaleString()}
             </div>
         </div>
     </div>

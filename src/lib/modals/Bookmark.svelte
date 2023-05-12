@@ -68,8 +68,10 @@
             return;
         }
 
+        console.log(event);
+
         const newListEvent = new NDKEvent($ndk, {
-            kind: 30000,
+            kind: 30001,
             tags: [
                 ['d', newListName ],
                 event.tagReference(),

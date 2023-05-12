@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { createEventDispatcher } from 'svelte';
     import { getText, getParagraph, getSentence } from 'get-selection-more'
 
@@ -9,9 +9,10 @@
     let wrapperEl: HTMLDivElement;
     const dispatch = createEventDispatcher();
 
+    let listener: any;
+
     onMount(() => {
-        // when wrapperEl is selected
-        document.addEventListener("selectionchange", () => {
+        listener = () => {
             // get the selection
             const sel = window.getSelection();
             var selectedRange = sel.getRangeAt(0);
@@ -25,7 +26,16 @@
                 }
                 dispatch('selectionchange', d);
             }
-        });
+        }
+
+        // when wrapperEl is selected
+        document.addEventListener("selectionchange", listener);
+    })
+
+    onDestroy(() => {
+        if (listener) {
+            document.removeEventListener("selectionchange", listener);
+        }
     })
 </script>
 

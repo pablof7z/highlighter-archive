@@ -54,7 +54,7 @@
         </ToolbarButton>
         {#if openMenu}
             <div class=" bg-white flex font-semibold text-sm flex-col absolute rounded-xl shadow-lg mt-10 border border-zinc-400">
-                <a href="/atlas/bookmarks/people/new" class="
+                <a href="/atlas/lists/people/new" class="
                     text-zinc-500 hover:text-white
                     bg-whitse hover:bg-orange-600
                     px-4 py-2 rounded-xl

@@ -3,14 +3,13 @@
     import Highlight from "./HighlightListItem.svelte";
     import HighlightInterface from '$lib/interfaces/highlights';
 
-    const purpleTextOrangeHighlightsId = 'naddr1qqxnzd3cxqmrzv3exgmr2wfeqy08wumn8ghj7mn0wd68yttsw43zuam9d3kx7unyv4ezumn9wshszyrhwden5te0dehhxarj9ekk7mf0qy88wumn8ghj7mn0wvhxcmmv9uq3zamnwvaz7tmwdaehgu3wwa5kuef0qy2hwumn8ghj7un9d3shjtnwdaehgu3wvfnj7q3qdergggklka99wwrs92yz8wdjs952h2ux2ha2ed598ngwu9w7a6fsxpqqqp65wy2vhhv';
+    const purpleTextOrangeHighlightsId = '30023:6e468422dfb74a5738702a8823b9b28168abab8655faacb6853cd0ee15deee93:1680612926599';
     const highlightId = '532808e4d60f5f82b95aeaa3ed2e930a0c5973dccb0ede68b28b1931db91440f';
     let highlights;
-    let highlights2;
 
     onMount(() => {
         highlights = HighlightInterface.fromIds([highlightId]);
-        HighlightInterface.startStream({articleNaddr: purpleTextOrangeHighlightsId});
+        HighlightInterface.startStream({articleId: purpleTextOrangeHighlightsId});
     })
 
 </script>

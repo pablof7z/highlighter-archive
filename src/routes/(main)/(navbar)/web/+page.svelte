@@ -11,6 +11,6 @@
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
 
-<main class="max-w-2xl mx-auto pb-32 flex flex-col items-center gap-6">
+<main class="pb-32 flex flex-col items-center gap-6">
     <Console {url} {authorPubkey} />
 </main>

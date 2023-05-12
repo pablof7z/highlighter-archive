@@ -39,6 +39,7 @@
 
     $: if (id !== prevId) {
         prevId = id;
+        console.log('calling into loading article 3', id)
         article = ArticleInterface.load({id});
 
         // load all highlights for this article
@@ -98,8 +99,8 @@
                 {/each}
             </ul>
         </div>
-        <div class="bg-zinc-50 -mx-8 -mb-4 px-8 py-3">
-            {#if $articleHighlights.length > maxHighlightCountToShow}
+        {#if $articleHighlights.length > maxHighlightCountToShow}
+            <div class="bg-zinc-50 -mx-8 -mb-4 px-8 py-3">
                 <div class="flex flex-row gap-2 items-center">
                     <div class="isolate flex -space-x-2 overflow-hidden">
                         {#each Array.from(highlightPubkeys).slice(0, 6) as highlightPubkey}
@@ -115,7 +116,7 @@
                         {$articleHighlights.length-maxHighlightCountToShow} more highlights...
                     </button>
                 </div>
-            {/if}
-        </div>
+            </div>
+        {/if}
     {/if}
 {/if}

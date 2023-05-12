@@ -16,7 +16,7 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
 interface ILoadOpts {
     ids?: string[];
     pubkeys?: string[];
-    articleNaddr?: string;
+    articleId?: string;
     replies?: string[];
     quotes?: string[];
     limit?: number;
@@ -57,10 +57,8 @@ const NoteInterface = {
 
         let articleReference: string | undefined;
 
-        if (opts.articleNaddr) {
-            const ndecode = nip19.decode(opts.articleNaddr).data as any;
-            articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
-            filter['#a'] = [articleReference];
+        if (opts.articleId) {
+            filter['#a'] = [opts.articleId];
         }
 
         const ndk: NDK = getStore(ndkStore);
@@ -75,9 +73,8 @@ const NoteInterface = {
         if (opts.ids) {
             db.notes.where('id').anyOf(opts.ids).toArray().then((notes) => {
                 if (notes.length === opts.ids!.length) {
-                    console.log('notes from cache', notes.length);
                 } else {
-                    console.log('notes from cache', notes.length, 'need to fetch', opts.ids!.length - notes.length);
+                    console.log('notes from cache', notes.length, 'need to fetch', opts.ids!.length - notes.length, 'got requested', notes.length, {comparison: notes.length !== opts.ids!.length, idsRequested: opts.ids});
                     NoteInterface.startStream(opts);
                 }
             });
@@ -93,12 +90,9 @@ const NoteInterface = {
                     .reverse()
                     .sortBy('createdAt')
             );
-        } else if (opts.articleNaddr) {
-            const ndecode = nip19.decode(opts.articleNaddr).data as any;
-            let articleReference = `${ndecode.kind}:${ndecode.pubkey}:${ndecode.identifier}`
-
+        } else if (opts.articleId) {
             return liveQuery(() =>
-                db.notes.where({replyToArticleId: articleReference}).toArray()
+                db.notes.where({replyToArticleId: opts.articleId!}).toArray()
             );
         } else if (opts.replies) {
             return liveQuery(() =>
@@ -122,25 +116,29 @@ const NoteInterface = {
 
 async function processEvent(event: NDKEvent) {
     try {
-        const articleId = valueFromTag(event, 'a');
-        const eventId = valueFromTag(event, 'e');
-        const quotesEventId = valueFromTag(event, 'q');
-
-        const note: App.Note = {
-            id: event.tagId(),
-            pubkey: event.pubkey,
-            content: event.content,
-            replyToArticleId: articleId,
-            replyToEventId: eventId,
-            quotesEventId,
-            event: JSON.stringify(event.rawEvent()),
-            createdAt: event.created_at!
-        };
+        const note = handleEvent1(event);
 
         await db.notes.put(note);
     } catch (e) {
         console.error(e);
     }
+}
+
+export function handleEvent1(event: NDKEvent): App.Note {
+    const articleId = valueFromTag(event, 'a');
+    const eventId = valueFromTag(event, 'e');
+    const quotesEventId = valueFromTag(event, 'q');
+
+    return  {
+        id: event.tagId(),
+        pubkey: event.pubkey,
+        content: event.content,
+        replyToArticleId: articleId,
+        replyToEventId: eventId,
+        quotesEventId,
+        event: JSON.stringify(event.rawEvent()),
+        createdAt: event.created_at!
+    };
 }
 
 export default NoteInterface;

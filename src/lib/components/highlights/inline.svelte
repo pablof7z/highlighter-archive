@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Zaps from "../../../routes/atlas/components/notes/buttons/zaps.svelte";
+    import Zaps from "../events/buttons/zaps.svelte";
     import Name from "../Name.svelte";
     import Avatar from "../Avatar.svelte";
 

@@ -53,7 +53,7 @@
             inline-flex w-full
             justify-center gap-x-1.5
             rounded-md bg-white
-            sm:px-4 py-2
+            px-2 sm:px-4 py-2
             text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50
             capitalize
         " aria-expanded="true" aria-haspopup="true"
@@ -89,50 +89,3 @@
         </div>
     {/if}
 </div>
-
-<!-- <div class="
-    flex flex-row text-slate-300 items-center justify-center mb-4 sm:mb-12 sm:gap-4
-    whitespace-nowrap
-">
-    <Link
-        href="/my"
-        klass="
-            text-zinc-300 hover:text-white
-            transition duration-300
-            pb-2
-        "
-        activeKlass="text-white font-bold border-b-2 border-white pb-2"
-    >
-        <MyHighlightsIcon />
-        <span class="hidden sm:block">Personal</span>
-    </Link>
-    <Tooltip  color="black">Personal</Tooltip>
-
-    <Link
-        href="/"
-        klass="
-            text-zinc-300 hover:text-white
-            transition duration-300
-            pb-2
-        "
-        activeKlass="text-white font-bold border-b-2 border-white pb-2"
-    >
-        <FollowsIcon />
-        <span class="hidden sm:block">Network</span>
-    </Link>
-    <Tooltip  color="black">Highlights from the people you follow</Tooltip>
-
-    <Link
-        href="/global"
-        klass="
-            text-zinc-300 hover:text-white
-            transition duration-300
-            pb-2
-        "
-        activeKlass="text-white font-bold border-b-2 border-white pb-2"
-    >
-        <GlobalIcon />
-        <span class="hidden sm:block">Global</span>
-    </Link>
-    <Tooltip  color="black">Global Feed</Tooltip>
-</div> -->

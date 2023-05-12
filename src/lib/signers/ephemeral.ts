@@ -1,20 +1,35 @@
-import NDK, { NDKEvent, NDKPrivateKeySigner, type NDKSigner, type NDKUserProfile } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKPrivateKeySigner, type NDKFilter, type NDKSigner, type NDKUserProfile } from "@nostr-dev-kit/ndk";
 import type { NDKTag, NostrEvent } from "@nostr-dev-kit/ndk/lib/src/events";
 import {sha256} from '@noble/hashes/sha256'
 import {bytesToHex} from '@noble/hashes/utils'
 
 const CURRENT_PRIVATE_NOTE_VERSION = '2';
 
+interface IFindEphemeralSignerLookups {
+    name?: string;
+    associatedEventNip19?: string;
+}
+
 /**
  * Finds a named ephemeral signer from a self-DM.
  */
-export async function findEphemeralSigner(ndk: NDK, mainSigner: NDKSigner, name: string) {
-    const hashedName = await getHashedKeyName(name);
+export async function findEphemeralSigner(
+    ndk: NDK,
+    mainSigner: NDKSigner,
+    opts: IFindEphemeralSignerLookups
+): Promise<NDKPrivateKeySigner | undefined> {
+    const mainUser = await mainSigner.user();
+    const filter: NDKFilter = {kinds:[4], '#p': [mainUser.hexpubkey()]};
 
-    const event = await ndk.fetchEvent({
-        kinds: [4],
-        '#e': [hashedName]
-    })
+    if (opts.name) {
+        const hashedName = await getHashedKeyName(opts.name);
+        filter["#e"] = [hashedName];
+    } else if (opts.associatedEventNip19) {
+        const hashedEventReference = await getHashedKeyName(opts.associatedEventNip19);
+        filter["#e"] = [hashedEventReference];
+    }
+
+    const event = await ndk.fetchEvent(filter);
 
     if (event) {
         await event.decrypt(await mainSigner.user());
@@ -62,6 +77,12 @@ async function generateTags(mainSigner: NDKSigner, opts: ISaveOpts = {}) {
         ['p', mainUser.hexpubkey() ],
         ['client', 'atlas']
     ];
+
+    if (opts.associatedEvent) {
+        // TODO: This is trivially reversable; better to encrypt it or hash it with the hexpubkey
+        const hashedEventReference = await getHashedKeyName(opts.associatedEvent.encode());
+        tags.push(['e', hashedEventReference]);
+    }
 
     if (opts.name) {
         const hashedName = await getHashedKeyName(opts.name);

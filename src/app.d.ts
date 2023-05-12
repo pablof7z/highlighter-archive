@@ -19,8 +19,9 @@ declare global {
             content: string;
             context?: string;
             articleId?: string;
-            event: string;
-            timestamp: number;
+            event?: string;
+            timestamp?: number;
+            scope?: string;
         }
 
         interface Note {

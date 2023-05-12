@@ -91,12 +91,12 @@
         tags.push(['name', listName]);
         tags.push(['d', listName]);
         const event = new NDKEvent($ndk, {
-            kind: 30000,
+            kind: 30001,
             tags,
             content: listDescription,
         } as NostrEvent);
         await event.publish();
-        goto(`/atlas/bookmarks/${event.encode()}`);
+        goto(`/atlas/lists/${event.encode()}`);
     }
 </script>
 

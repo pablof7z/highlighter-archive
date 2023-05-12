@@ -15,23 +15,33 @@
      */
     export let maxHighlightCountToShow: number | undefined = undefined;
     export let scope: string | undefined = undefined;
+    export let pubkey: string | undefined = undefined;
+
     let prevScope: string;
     let prevPubkey: string;
+
+    let pubkeys: string[] | undefined = undefined;
 
     $: if (scope !== prevScope && scope) {
         prevScope = scope;
 
         switch (scope) {
+            case "pubkey":
+                if (!pubkey) throw new Error('pubkey is required for scope "pubkey"');
+                pubkeys = [pubkey];
+                break;
             case 'personal':
-                loadArticlesGroupedByHighlights({pubkeys: [$currentUser?.hexpubkey()]});
+                pubkeys = [$currentUser?.hexpubkey()!];
                 break;
             case 'network':
-                loadArticlesGroupedByHighlights({pubkeys: $currentUserFollowPubkeys});
+                pubkeys = $currentUserFollowPubkeys;
                 break;
             case 'global':
-                loadArticlesGroupedByHighlights();
+                pubkeys = undefined;
                 break;
         }
+
+        loadArticlesGroupedByHighlights({pubkeys});
     }
 
     let subs: NDKSubscription[] = [];
@@ -73,12 +83,12 @@
     }
 </script>
 
-<ul role="list" class="space-y-3">
+<ul class="space-y-3">
     {#each taggedEventIds as articleId}
         <li class="overflow-hidden rounded-md bg-white px-6 py-4 shadow">
             <ArticleCardWithHighlights
                 id={articleId}
-                highlightsFrom={$currentUserFollowPubkeys}
+                highlightsFrom={pubkeys}
                 {maxHighlightCountToShow}
                 {skipHighlighter}
             />

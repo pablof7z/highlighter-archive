@@ -40,7 +40,7 @@
         }
 
         const newListEvent = new NDKEvent($ndk, {
-            kind: 30000,
+            kind: 30001,
             tags: [
                 ['d', name ],
             ],
@@ -49,7 +49,7 @@
             newListEvent.tags.push(['d', description]);
         }
         await newListEvent.publish();
-        goto(`/atlas/bookmarks/${newListEvent.encode()}`);
+        goto(`/atlas/lists/${newListEvent.encode()}`);
         closeModal();
     }
 </script>
