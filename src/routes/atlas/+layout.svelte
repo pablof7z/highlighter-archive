@@ -8,7 +8,8 @@
     import Name from '$lib/components/Name.svelte';
     import NavigationButton from './components/navigation/Button.svelte';
 
-    import { ndk, currentUser } from '$lib/store';
+    import { currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import { Modals, closeModal } from 'svelte-modals'
     import { fade } from 'svelte/transition'
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKEvent } from '@nostr-dev-kit/ndk';
 
     import NavigationButton from './Button.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {ndk} from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import NoteVisibility from './note/visibility.svelte';
 
     import { createEventDispatcher } from 'svelte';

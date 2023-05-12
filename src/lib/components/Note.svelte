@@ -2,7 +2,7 @@
 	import CommentIcon from '$lib/icons/Comment.svelte';
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import Comment from '$lib/components/Comment.svelte';
     import NoteInterface from '$lib/interfaces/notes';

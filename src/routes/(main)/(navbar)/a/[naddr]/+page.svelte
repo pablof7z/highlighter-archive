@@ -8,7 +8,7 @@
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import { openModal } from 'svelte-modals'
     import HighlightIntroModal from '$lib/modals/HighlightIntro.svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { idFromNaddr } from '$lib/utils';
 
     const { naddr } = $page.params;

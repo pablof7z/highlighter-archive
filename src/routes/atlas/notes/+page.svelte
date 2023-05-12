@@ -7,7 +7,8 @@
     import SecretNodeEditor from '../components/secret-notes/editor.svelte';
 
     import { NDKEvent } from '@nostr-dev-kit/ndk';
-    import { ndk, currentUser } from '$lib/store';
+    import { currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
     import { generateEphemeralSigner, saveEphemeralSigner } from '$lib/signers/ephemeral';
 

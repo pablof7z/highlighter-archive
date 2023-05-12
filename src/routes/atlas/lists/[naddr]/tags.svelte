@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { NDKTag } from '@nostr-dev-kit/ndk/lib/src/events';
-    import { currentUser, ndk } from '$lib/store';
+    import { currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import type { Observable } from 'dexie';
     import type { NDKSubscription } from '@nostr-dev-kit/ndk';
 

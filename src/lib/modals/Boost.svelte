@@ -1,6 +1,6 @@
 <script lang="ts">
     import CloseIcon from '$lib/icons/Close.svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import ClickToAddComment from '$lib/components/ClickToAddComment.svelte';
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import { closeModal } from 'svelte-modals';

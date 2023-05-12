@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKEvent, NDKPrivateKeySigner, type NostrEvent } from "@nostr-dev-kit/ndk";
     import { Editor, Viewer } from 'bytemd';
     import gfm from '@bytemd/plugin-gfm'

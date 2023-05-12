@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk, currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
 
     import HighlightInterface from '$lib/interfaces/highlights';
     import HighlightList from '../components/highlights/Card.svelte';

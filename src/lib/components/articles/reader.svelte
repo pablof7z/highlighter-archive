@@ -10,7 +10,8 @@
     import ScopeDropdown from '$lib/components/ScopeDropdown.svelte';
     import HighlightList from '$lib/components/HighlightList.svelte';
     import HighlightListItemForm from '$lib/components/HighlightListItemForm.svelte';
-    import { currentUser, currentUserFollowPubkeys, ndk } from '$lib/store';
+    import { currentUser, currentUserFollowPubkeys } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import HighlightWrapper from '$lib/components/HighlightWrapper.svelte';
     import { fade } from 'svelte/transition';
     import { fetchFollowers } from '$lib/currentUser';

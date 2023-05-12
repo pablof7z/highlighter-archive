@@ -1,5 +1,5 @@
 import { get as getStore } from 'svelte/store';
-import {ndk as ndkStore} from '$lib/store';
+import ndkStore from '$lib/stores/ndk';
 import { liveQuery } from 'dexie';
 import { browser } from '$app/environment';
 import { db } from '$lib/interfaces/db';

@@ -3,7 +3,7 @@
 
     import BoostIcon from '$lib/icons/Boost.svelte';
     import { Tooltip } from 'flowbite-svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
 
     import { openModal } from 'svelte-modals'

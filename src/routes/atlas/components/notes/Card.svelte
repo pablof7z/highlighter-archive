@@ -14,7 +14,8 @@
 
     import Avatar from '$lib/components/Avatar.svelte';
     import Name from '$lib/components/Name.svelte';
-    import { currentUser, ndk } from '$lib/store';
+    import { currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
     import CloseIcon from '$lib/icons/Close.svelte';
     import { NDKEvent, zapInvoiceFromEvent } from '@nostr-dev-kit/ndk';

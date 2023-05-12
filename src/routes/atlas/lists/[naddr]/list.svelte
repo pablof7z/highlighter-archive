@@ -2,7 +2,8 @@
 	import Visibility from './../../components/note/visibility.svelte';
 	import NewIcon from '$lib/icons/New.svelte';
 
-    import { currentUser, ndk } from '$lib/store';
+    import { currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
 
     import NoteVisibility from '../../components/note/visibility.svelte';

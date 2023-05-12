@@ -1,7 +1,8 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import UserInterface from '$lib/interfaces/users';
-    import { backgroundBanner, ndk } from '$lib/store';
+    import { backgroundBanner } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import type { NDKUser } from '@nostr-dev-kit/ndk';
     import NpubHighlights from './npub-highlights.svelte';
 

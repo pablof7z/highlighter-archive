@@ -6,7 +6,7 @@
     import Avatar from "$lib/components/Avatar.svelte";
     import InlineHighlight from "$lib/components/highlights/inline.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
-    import { ndk } from "$lib/store";
+    import ndk from "$lib/stores/ndk";
 
     /**
      * ID of the article to load

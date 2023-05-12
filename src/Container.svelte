@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from './lib/store';
+    import ndk from './lib/stores/ndk';
     import KeyPrompt from './KeyPrompt.svelte';
     import {Readability, isProbablyReaderable } from '@mozilla/readability';
     import { onMount, onDestroy } from 'svelte';

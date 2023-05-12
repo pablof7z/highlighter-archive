@@ -4,7 +4,7 @@
 
     import ClickToAddComment from './ClickToAddComment.svelte';
 
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKEvent, NDKRelaySet, NDKUser, type NostrEvent } from '@nostr-dev-kit/ndk';
     import RoundedButton from '../../routes/(main)/components/RoundedButton.svelte';
     import { createEventDispatcher } from 'svelte';

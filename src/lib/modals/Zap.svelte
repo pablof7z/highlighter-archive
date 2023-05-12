@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import UserCard from '$lib/components/UserCard.svelte';
     import PillButton from '$lib/components/buttons/pill.svelte';
     import CloseIcon from '$lib/icons/Close.svelte';

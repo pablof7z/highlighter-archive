@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     // import QR from 'svelte-qr';
-    import { ndk } from './lib/store';
+    import ndk from './lib/stores/ndk';
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
 
     let hasNostrNip07 = true;

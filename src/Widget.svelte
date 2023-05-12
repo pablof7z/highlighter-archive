@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
     import { onMount } from 'svelte';
     import Container from './Container.svelte';

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ndk, currentUser } from '$lib/store';
+    import ndk from "$lib/stores/ndk";
     import BookmarkListInterface from '$lib/interfaces/bookmark-list';
 
     import NewIcon from '$lib/icons/New.svelte';

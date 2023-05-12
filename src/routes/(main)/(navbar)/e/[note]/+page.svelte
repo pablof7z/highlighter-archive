@@ -6,7 +6,7 @@
     import { fetchArticle } from '$lib/article';
     import Highlight from '$lib/components/HighlightListItem.svelte';
     import Note from '$lib/components/Note.svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { handleEvent1 } from '$lib/interfaces/notes';
 
     let { note } = $page.params;

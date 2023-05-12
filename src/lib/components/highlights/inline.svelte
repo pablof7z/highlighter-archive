@@ -12,7 +12,7 @@
     import { Tooltip } from "flowbite-svelte";
     import { openModal } from 'svelte-modals'
     import BookmarkModal from '$lib/modals/Bookmark.svelte';
-    import { ndk } from "$lib/store";
+    import ndk from "$lib/stores/ndk";
     import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import NoteInterface from "$lib/interfaces/notes";
 

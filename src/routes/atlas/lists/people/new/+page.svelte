@@ -1,6 +1,6 @@
 <script lang="ts">
     import UserCard from '../../../components/users/Card.svelte';
-    import { ndk } from '$lib/store';
+    import ndk from '$lib/stores/ndk';
     import { NDKEvent, type NDKUser } from '@nostr-dev-kit/ndk';
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
     import { onMount } from 'svelte';
