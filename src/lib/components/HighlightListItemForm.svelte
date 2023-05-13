@@ -49,7 +49,7 @@
         if (comment) {
             const commentEvent = new NDKEvent($ndk, {
                 kind: 1,
-                content: `${comment}\nnostr:${event.encode()}`,
+                content: `nostr:${event.encode()}\n${comment}`,
                 tags: [
                     ['q', event.tagId(), 'quote']
                 ]

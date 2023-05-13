@@ -5,11 +5,13 @@
     import { NDKEvent, type NostrEvent } from '@nostr-dev-kit/ndk';
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';
+    import NoteCard from '$lib/components/notes/card.svelte';
     import HighlightCard from '$lib/components/highlights/card.svelte';
     import RoundedButton from '../../routes/(main)/components/RoundedButton.svelte';
 
     export let event: NDKEvent;
-    export let highlight: App.Highlight;
+    export let note: App.Note | undefined = undefined;
+    export let highlight: App.Highlight | undefined = undefined;
     export let article: App.Article;
 
     let comment: string;
@@ -18,14 +20,12 @@
         if (comment && comment.length > 0) {
             const commentEvent = new NDKEvent($ndk, {
                 kind: 1,
-                content: `nostr:${event.encode()}\n${comment}`,
+                content: comment,
                 tags: [
-                    ['q', event.tagId(), 'quote']
+                    ['e', event.tagId(), 'reply']
                 ]
             } as NostrEvent)
             await commentEvent.publish();
-
-            closeModal();
         }
     }
 </script>
@@ -33,6 +33,7 @@
 <div role="dialog" class="modal" transition:fade>
     <div class="
         max-w-prose
+        w-full
         rounded-xl p-6
         shadow-xl shadow-black
         bg-zinc-50
@@ -47,17 +48,16 @@
         </button>
 
         <div class="flex flex-col gap-8">
-            <h2 class="text-zinc-500 font-semibold text-base uppercase">REPOST</h2>
+            <h2 class="text-zinc-500 font-semibold text-base uppercase">REPLY</h2>
 
             <div class="flex flex-col gap-8">
-                <HighlightCard
-                    {highlight}
-                    {article}
+                <NoteCard
+                    {note}
                     skipTitle={true}
                     skipButtons={true}
                 />
 
-                <ClickToAddComment bind:value={comment} />
+                <ClickToAddComment bind:value={comment} show={true} />
             </div>
 
             <div class="flex flex-row justify-between">

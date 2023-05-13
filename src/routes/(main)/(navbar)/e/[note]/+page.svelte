@@ -5,7 +5,7 @@
     import { onMount } from 'svelte';
     import { fetchArticle } from '$lib/article';
     import Highlight from '$lib/components/HighlightListItem.svelte';
-    import Note from '$lib/components/Note.svelte';
+    import Note from '$lib/components/notes/card.svelte';
     import ndk from '$lib/stores/ndk';
     import { handleEvent1 } from '$lib/interfaces/notes';
 
@@ -59,12 +59,14 @@
 	<meta name="description" content="Unleash valuable words from their artificial silos" />
 </svelte:head>
 
-<main class="max-w-xl mx-auto pb-32">
-    {#each _highlights as highlight}
-        <Highlight {highlight} disableClick={true} />
-    {/each}
+{#key note}
+    <main class="max-w-xl mx-auto pb-32">
+        {#each _highlights as highlight}
+            <Highlight {highlight} disableClick={true} />
+        {/each}
 
-    {#if _note}
-        <Note note={_note} />
-    {/if}
-</main>
+        {#if _note}
+            <Note note={_note} />
+        {/if}
+    </main>
+{/key}

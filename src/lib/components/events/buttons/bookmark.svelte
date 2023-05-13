@@ -15,4 +15,4 @@
     class="text-slate-500 hover:text-purple-700"
     on:click={() => { openModal(BookmarkModal, { event }) }}
 ><BookmarkIcon /></button>
-<Tooltip  color="black">Bookmark</Tooltip>
+<Tooltip color="black">Bookmark</Tooltip>

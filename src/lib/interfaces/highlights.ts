@@ -159,7 +159,7 @@ async function handleEvent6(event: NDKEvent) {
     return highlight;
 }
 
-export async function handleEvent9802(event: NDKEvent) {
+export function handleEvent9802(event: NDKEvent) {
     const articleId = valueFromTag(event, 'a');
     const url = valueFromTag(event, 'r');
     const context = valueFromTag(event, 'context');
@@ -172,7 +172,7 @@ export async function handleEvent9802(event: NDKEvent) {
         context,
         articleId,
         timestamp: event.created_at || Math.floor(Date.now() / 1000),
-        event: JSON.stringify(await event.toNostrEvent())
+        event: JSON.stringify(event.rawEvent())
     };
 
     return highlight;

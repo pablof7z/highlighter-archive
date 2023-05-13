@@ -27,7 +27,7 @@
     });
 </script>
 
-<div class="grid grid-cols-1 gap-8">
+<div class="grid grid-cols-1 gap-8 pb-32">
     {#if $items}
         {#each $items as item}
             <HighlightListItem
