@@ -59,11 +59,11 @@
             case 'personal':
                 return 'Personal';
             case 'network':
-                return `My Network (${($currentUserFollowPubkeys || []).length})`;
+                return `My Network`;
             case 'global':
                 return 'Global';
             case 'curated':
-                return 'Curated List';
+                return 'Curated List [coming soon]';
         }
     }
 
@@ -105,9 +105,10 @@
                     <a
                         href={urlFor(option)}
                         class="
-                        text-gray-700 block px-4 py-2 text-sm
-                        hover:bg-beige-150 transition duration-75 w-full
+                        block px-4 py-2 text-sm
+                        transition duration-75 w-full
                         text-left
+                        {option === 'curated' ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-beige-150 '}
                     " role="menuitem" tabindex="-1"
                     on:click={(e)=>{select(e, option)}}>
                         {valueToText(option)}

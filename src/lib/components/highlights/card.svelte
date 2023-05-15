@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fetchArticle } from '$lib/article';
     import EventCard from '$lib/components/events/card.svelte';
     import HighlightContent from '$lib/components/highlights/content.svelte';
 
@@ -7,12 +6,11 @@
     import { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import type { ILoadOpts } from '$lib/interfaces/highlights';
-  import ArticleInterface from '$lib/interfaces/article';
-  import type { Observable } from 'dexie';
+    import ArticleInterface from '$lib/interfaces/article';
+    import type { Observable } from 'dexie';
 
     export let article: App.Article | undefined = undefined;
     export let highlight: App.Highlight;
-    export let skipUrl: boolean = false;
     export let skipTitle: boolean = false;
     export let skipButtons: boolean = false;
     export let skipFooter: boolean = false;
@@ -23,7 +21,7 @@
     let articleLink: string;
     let naddr: string;
 
-    function onContentClick(e) {
+    function onContentClick(e: Event) {
         if (disableClick) return;
 
         // see if there is an element that has attribute data-highlight with the id of the highlight
@@ -46,10 +44,7 @@
 
     let articles: Observable<App.Article[]> | undefined = undefined;
 
-    $: console.log(`highlight?.articleId`, highlight?.articleId)
-
     $: if (highlight?.articleId && !articles) {
-        console.log(`fetch artcile ${highlight.articleId}`);
         articles = ArticleInterface.load({id: highlight.articleId});
     }
 
