@@ -4,6 +4,28 @@ import MarkdownIt from 'markdown-it';
 import {nip19} from 'nostr-tools';
 import type { NDKFilter } from '@nostr-dev-kit/ndk';
 
+export function nicelyFormattedSatNumber(amount: number) {
+    // if the number is less than 1000, just return it
+    if (amount < 1000) return amount;
+
+    // if the number is less than 1 million, return it with a k, if the comma is not needed remove it
+    if (amount < 1000000) return `${(amount / 1000).toFixed(1)}k`;
+
+    // if the number is less than 1 billion, return it with an m
+    if (amount < 1000000000) return `${(amount / 1000000).toFixed(1)}m`;
+
+    return `${(amount / 100_000_000).toFixed(2)} btc`;
+}
+
+export function filterForId(id: string): NDKFilter {
+    if (!!id.match(/:/)) {
+        const [kind, pubkey, identifier] = id.split(':');
+        return { kinds: [kind], authors: [pubkey], "#d": [identifier] };
+    } else {
+        return { "#e": [id] };
+    }
+}
+
 export function filterFromNaddr(naddr: string): NDKFilter {
     const ndecode = nip19.decode(naddr).data as any;
 

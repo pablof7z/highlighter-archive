@@ -8,6 +8,8 @@
     function load() {
         if (!url) return;
 
+        const midUrlEventMatcher = /\/(naddr|nevent|note)*1([a-zA-Z0-9]+)\/?$/i;
+
         if (
             url.startsWith('naddr1') ||
             url.startsWith('nevent1') ||
@@ -15,11 +17,11 @@
         ) {
             goto(`/a/${encodeURIComponent(url)}`);
             return;
-        } else if (url.match(/\/naddr1/i)) {
+        } else if (url.match(midUrlEventMatcher)) {
             // extract from url the naddr to the end of the string which can be of any length and remove
             // the leading slash
             try {
-                let naddr = url.match(/\/naddr1.*/)![0].slice(1);
+                let naddr = url.match(midUrlEventMatcher)![0].slice(1);
 
                 goto(`/a/${encodeURIComponent(naddr)}`);
                 return;
@@ -34,12 +36,17 @@
 
         goto(loadUrl);
     }
+
+    function setValue(e) {
+        url = e.target.attributes.href.value;
+
+        setTimeout(load, 1000);
+    }
 </script>
 
 <div class="flex flex-col items-center gap-6 w-full">
-    <p class="text-zinc-600 text-xl font-thin mb-4">
-        Enter a NIP-23 <code>naddr</code> or a URL from
-        any website (e.g. medium.com).
+    <p class="text-zinc-800 text-2xl mb-4 font-semibold">
+        Enter a URL from any website, or a nostr event's ID.
     </p>
 
     <div class="flex flex-row gap-4 w-full">
@@ -83,4 +90,47 @@
             Know the author's pubkey?
         </button>
     {/if}
+
+    <div class="overflow-hidden rounded-lg bg-white shadow p-6 flex flex-col gap-4">
+        <h3 class="text-lg font-semibold">
+            Some things to try
+        </h3>
+
+        <ul class="flex flex-col gap-2 max-w-prose overflow-auto ">
+            <li>
+                Snort link:
+                <button on:click={setValue} href="https://snort.social/e/note194n247lecqgcskk5rmmfgrapt4jx7ppq64xec0eca3s4ta3hwkrsex7pxa" class="text-orange-500">
+                    https://snort.social/e/note194n247lecqgcskk5rmmfgrapt4jx7ppq64xec0eca3s4ta3hwkrsex7pxa
+                </button>
+            </li>
+
+            <li>
+                Kind 1 (short note) event:
+                <button on:click={setValue} href="note194n247lecqgcskk5rmmfgrapt4jx7ppq64xec0eca3s4ta3hwkrsex7pxa" class="text-orange-500">
+                    note194n247lecqgcskk5rmmfgrapt4jx7ppq64xec0eca3s4ta3hwkrsex7pxa
+                </button>
+            </li>
+
+            <li>
+                Medium Article
+                <button on:click={setValue} href="https://medium.com/btc24/nostr-a-decentralised-social-platform-2651930378b9" class="text-orange-500">
+                    https://medium.com/btc24/nostr-a-decentralised-social-platform-2651930378b9
+                </button>
+            </li>
+
+            <li>
+                Habla.news link:
+                <button on:click={setValue} href="https://habla.news/a/naddr1qqxryvpjxvcrgvfsfacy2eqpzdmhxue69uhhyetvv9ujue3h0ghxjme0qy0hwumn8ghj7mn0wd68yttjv4kxz7fwdehkkmm5v9ex7tnrdakj7q3q9mduaf5569jx9xz555jcx3v06mvktvtpu0zgk47n4lcpjsz43zzqxpqqqp65w27z7wl" class="text-orange-500">
+                    https://habla.news/a/naddr1qqxryvpjxvcrgvfsfacy2eqpzdmhxue69uhhyetvv9ujue3h0ghxjme0qy0hwumn8ghj7mn0wd68yttjv4kxz7fwdehkkmm5v9ex7tnrdakj7q3q9mduaf5569jx9xz555jcx3v06mvktvtpu0zgk47n4lcpjsz43zzqxpqqqp65w27z7wl
+                </button>
+            </li>
+
+            <li>
+                NIP-23 (long-form article) event:
+                <button on:click={setValue} href="naddr1qqxryvpjxvcrgvfsfacy2eqpzdmhxue69uhhyetvv9ujue3h0ghxjme0qy0hwumn8ghj7mn0wd68yttjv4kxz7fwdehkkmm5v9ex7tnrdakj7q3q9mduaf5569jx9xz555jcx3v06mvktvtpu0zgk47n4lcpjsz43zzqxpqqqp65w27z7wl" class="text-orange-500">
+                    naddr1qqxryvpjxvcrgvfsfacy2eqpzdmhxue69uhhyetvv9ujue3h0ghxjme0qy0hwumn8ghj7mn0wd68yttjv4kxz7fwdehkkmm5v9ex7tnrdakj7q3q9mduaf5569jx9xz555jcx3v06mvktvtpu0zgk47n4lcpjsz43zzqxpqqqp65w27z7wl
+                </button>
+            </li>
+        </ul>
+    </div>
 </div>

@@ -5,36 +5,25 @@
     import Newest from './newest.svelte';
     import Highlights from './highlights.svelte';
     import { fetchFollowers } from '$lib/currentUser';
+    import { browser } from '$app/environment';
 
     let { scope, ordering } = $page.params;
-    let followsPromise: Promise<boolean> | undefined = undefined;
+    let followsPromise: Promise<void> | undefined = undefined;
 
     $: {
         scope = $page.params.scope;
         ordering = $page.params.ordering;
     }
 
-    $: if (scope === 'network') {
+    $: if (scope === 'network' && browser) {
         if (!$currentUserFollowPubkeys) {
-            fetchFollowers();
+            followsPromise = fetchFollowers();
         }
     }
 </script>
 
-{#if scope === 'network'}
-    {#await followsPromise}
-        <p>loading...</p>
-    {:then}
-        {#if ordering === 'newest'}
-            <Newest {scope} />
-        {:else if ordering === 'highlights'}
-            <Highlights {scope} />
-        {/if}
-    {/await}
-{:else}
-    {#if ordering === 'newest'}
-        <Newest {scope} />
-    {:else if ordering === 'highlights'}
-        <Highlights {scope} />
-    {/if}
+{#if ordering === 'newest'}
+    <Newest {scope} />
+{:else if ordering === 'highlights'}
+    <Highlights {scope} />
 {/if}

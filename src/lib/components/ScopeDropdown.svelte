@@ -59,7 +59,7 @@
             case 'personal':
                 return 'Personal';
             case 'network':
-                return 'My Network';
+                return `My Network (${($currentUserFollowPubkeys || []).length})`;
             case 'global':
                 return 'Global';
             case 'curated':

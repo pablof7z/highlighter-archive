@@ -4,6 +4,8 @@
     import { parseContent } from '$lib/nip27';
     export let note: string;
     export let tags: any[];
+    export let addNewLines: boolean = true;
+    export let kind: number | undefined = undefined;
     let notePrev: string;
 
     const links = []
@@ -39,9 +41,9 @@
                 let n = 1
                 for (let j = i - 1; ; j--) {
                     if (content[j]?.type === "newline") {
-                    n += 1
+                        n += 1
                     } else {
-                    break
+                        break
                     }
                 }
 
@@ -52,17 +54,19 @@
 }
 </script>
 
+<!-- text-black -->
 <div class="
-    leading-relaxed
+    leading-normal
     h-full flex flex-col sm:text-justify
-    text-black
     overflow-auto
 ">
     <div>
         {#each content as { type, value }}
             {#if type === "newline"}
                 {#each value as _}
-                    <br />
+                    {#if addNewLines}
+                        <br />
+                    {/if}
                 {/each}
             {:else if type === "link"}
                 {value.replace(/https?:\/\/(www\.)?/, "")}
@@ -74,14 +78,14 @@
                     </a>
                 {:else}
                     <div class="embedded-card text-sm">
-                        <GenericEventCard id={value.entity} />
+                        <GenericEventCard id={value.entity} skipReplies={true} />
                     </div>
                 {/if}
             {:else if type === "topic"}
                 <b>#{value}</b>
 
             {:else}
-                {value}
+                {@html value}
             {/if}
         {/each}
     </div>

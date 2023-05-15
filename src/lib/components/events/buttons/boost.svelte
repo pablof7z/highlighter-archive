@@ -43,7 +43,7 @@
 <button class="
     text-slate-500 hover:text-orange-500
     flex flex-row items-center gap-2
-" on:click={() => { openModal(BoostModal, { event, highlight }) }}>
+" on:click={() => { openModal(BoostModal, { id: event.encode() }) }}>
     <BoostIcon />
 </button>
 <Tooltip  color="black">Boost</Tooltip>

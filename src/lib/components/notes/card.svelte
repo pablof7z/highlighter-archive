@@ -11,6 +11,7 @@
     export let highlight: App.Note | App.Highlight;
     export let event: NDKEvent | undefined = undefined;
     export let skipButtons = false;
+    export let skipReplies = false;
 
     if (!event) event = new NDKEvent($ndk, JSON.parse(note.event));
 
@@ -21,7 +22,10 @@
         if (note.id) {
             // send null so a kind won't be autoset to 1
             noteQuery = NoteInterface.load({ ids: [note.id], kind: null });
-            replies = NoteInterface.load({ replies: [note.id] });
+
+            if (!skipReplies) {
+                replies = NoteInterface.load({ replies: [note.id] });
+            }
         }
     });
 </script>

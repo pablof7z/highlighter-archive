@@ -7,7 +7,7 @@ import { NDKEvent } from '@nostr-dev-kit/ndk';
 import type { NDKFilter } from '@nostr-dev-kit/ndk';
 import {nip19} from 'nostr-tools';
 import { browser } from '$app/environment';
-import { idFromNaddr } from '$lib/utils';
+import { filterForId, idFromNaddr } from '$lib/utils';
 
 function valueFromTag(event: NDKEvent, tag: string): string | undefined {
     const matchingTag = event.tags.find((t: string[]) => t[0] === tag);
@@ -40,7 +40,7 @@ const HighlightInterface = {
         console.log(`starting highlight stream with opts: ${JSON.stringify(opts)}`);
         let articleReference: string | undefined;
         const ndk: NDK = getStore(ndkStore);
-        const filter: NDKFilter = { kinds: [9802] };
+        let filter: NDKFilter = { kinds: [9802] };
         // const boostFilter: NDKFilter = { kinds: [6], '#k': ["9802"], since: 100000000 };
 
         if (opts.pubkeys) {
@@ -50,7 +50,7 @@ const HighlightInterface = {
 
         if (opts.ids) filter['ids'] = opts.ids;
         if (opts.articleId) {
-            filter['#a'] = [opts.articleId];
+            filter = { ...filterForId(opts.articleId), ...filter };
         }
 
         if (opts.url) filter['#r'] = [opts.url];
@@ -82,6 +82,7 @@ const HighlightInterface = {
 
 
     load: (opts: ILoadOpts = {}): Observable<App.Highlight[]> => {
+        if (!browser) return liveQuery(() => []);
         console.log(`requesting highlights`, opts)
 
         if (!browser) return liveQuery(() => Promise.resolve([]) );
@@ -95,8 +96,6 @@ const HighlightInterface = {
                     const boostedByIsInPubkeys = h.boostedBy && pubkeys!.includes(h.boostedBy);
 
                     const ret = !!(pubkeyIsInPubkeys || boostedByIsInPubkeys);
-
-                    if (ret) console.log(ret, pubkeys, h.pubkey, {  pubkeyIsInPubkeys,boostedByIsInPubkeys })
 
                     return ret;
                 }
@@ -113,10 +112,12 @@ const HighlightInterface = {
         } else if (opts.pubkeys) {
             query = query.filter(filters.highlightOrRepostBy(opts.pubkeys));
         } else if (opts.articleId) {
-            query = query.filter(h => h.articleId === opts.articleId);
+            query = query.filter(filters.articleId(opts.articleId))
         } else if (opts.ids) {
             query = query.filter(h => opts.ids!.includes(h.id!));
-        } else if (opts.url) {
+        }
+
+        if (opts.url) {
             query = query.filter(h => h.url === opts.url);
         }
 
@@ -160,9 +161,13 @@ async function handleEvent6(event: NDKEvent) {
 }
 
 export function handleEvent9802(event: NDKEvent) {
-    const articleId = valueFromTag(event, 'a');
+    let articleId = valueFromTag(event, 'a');
     const url = valueFromTag(event, 'r');
     const context = valueFromTag(event, 'context');
+
+    if (!articleId) {
+        articleId = valueFromTag(event, 'e');
+    }
 
     const highlight: App.Highlight = {
         id: event.tagId(),

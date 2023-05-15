@@ -3,7 +3,7 @@
     import Name from '$lib/components/Name.svelte';
     import UserInterface from '$lib/interfaces/users';
     import type { Observable } from 'dexie';
-    import FormattedContent from '$lib/components/events/FormattedContent.svelte';
+    import CardContent from '$lib/components/events/content.svelte';
 
     export let pubkey: string | undefined;
     export let userProfile: App.UserProfile | undefined = undefined;
@@ -44,7 +44,9 @@
             {/if}
 
             <div class="text-zinc-400 text-sm whitespace-normal">
-                <FormattedContent note={userProfile?.about||''} />
+                {#if userProfile?.about}
+                    <CardContent note={userProfile?.about||''} tags={[]} />
+                {/if}
             </div>
         </div>
     </div>

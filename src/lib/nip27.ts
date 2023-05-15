@@ -14,11 +14,11 @@ export function parseContent(content: string, tags = []) {
     let buffer = ""
 
     const parseNewline = () => {
-    const newline = first(text.match(/^\n+/))
+        const newline = first(text.match(/^\n+/))
 
-    if (newline) {
-        return ["newline", newline, newline]
-    }
+        if (newline) {
+            return ["newline", newline, newline]
+        }
     }
 
     const parseMention = () => {

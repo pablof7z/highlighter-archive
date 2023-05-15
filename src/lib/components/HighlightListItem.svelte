@@ -21,7 +21,6 @@
     let prevHighlightId: string | undefined = undefined;
 
     let replies, quotes;
-    let domain: string | undefined;
     let pubkey: string;
     let showComments = false;
     let showReplies = false;
@@ -47,12 +46,16 @@
             highlightNoteId = nip19.noteEncode(highlight.id);
 
             if (highlight.articleId) {
-                const [kind, pubkey, identifier] = highlight.articleId.split(':');
-                naddr = nip19.naddrEncode({
-                    kind: parseInt(kind),
-                    pubkey,
-                    identifier
-                })
+                if (highlight.articleId.match(/:/)) {
+                    const [kind, pubkey, identifier] = highlight.articleId.split(':');
+                    naddr = nip19.naddrEncode({
+                        kind: parseInt(kind),
+                        pubkey,
+                        identifier
+                    })
+                } else {
+                    naddr = nip19.noteEncode(highlight.articleId);
+                }
                 articleLink = `/a/${naddr}`;
             } else {
                 // see if this highlight.event has a p tag
@@ -88,24 +91,34 @@
         }
 
         pubkey = highlight.pubkey;
-
-        domain = highlight.url && new URL(highlight.url).hostname;
     }
 
+    function shouldDisplayQuote(highlight: App.Highlight, quotes: App.Note[]) {
+        return true;
+        // if (!quotes || quotes.length === 0) {
+        //     return true;
+        // }
+
+
+    }
 </script>
 
 <div class="
     flex flex-col
     {collapsedQuotes? '' : 'gap-8'}
 ">
-    <div class="text-lg">
-        <HighlightCard
-            {event}
-            {highlight}
-            {skipButtons}
-            {skipTitle}
-        />
-    </div>
+    {#if shouldDisplayQuote(highlight, $quotes)}
+        <div class="text-lg">
+            <HighlightCard
+                {event}
+                {highlight}
+                {skipButtons}
+                {skipTitle}
+                {disableClick}
+            />
+        </div>
+    <!-- {:else if shouldDisplayHighlighterQuote(highlight, $quotes)} -->
+    {/if}
 
     {#if ($quotes||[]).length > 0}
         {#if collapsedQuotes}

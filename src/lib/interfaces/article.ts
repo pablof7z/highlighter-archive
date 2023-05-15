@@ -42,6 +42,8 @@ const ArticleInterface = {
 
         const ndk: NDK = getStore(ndkStore);
 
+        console.log(`article load query`, filter)
+
         const subs = ndk.subscribe(filter);
 
         subs.on('event', async (event: NDKEvent) => {
@@ -79,5 +81,21 @@ const ArticleInterface = {
         }
     },
 };
+
+export function articleFromEvent(event: NDKEvent): App.Article {
+    const url = valueFromTag(event, 'r') || '';
+    const title = valueFromTag(event, 'title') || '';
+
+    return {
+        id: event.tagId(),
+        url,
+        title,
+        tags: event.tags.filter(t => t[0] === 't').map(t => t[1]),
+        author: valueFromTag(event, 'author') || event.pubkey,
+        publisher: event.pubkey,
+        content: event.content,
+        event: JSON.stringify(event.rawEvent()),
+    };
+}
 
 export default ArticleInterface;

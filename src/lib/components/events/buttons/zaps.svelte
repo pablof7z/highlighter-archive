@@ -8,31 +8,40 @@
 
     import ZapModal from '$lib/modals/Zap.svelte';
     import { onMount } from 'svelte';
+    import type { NDKEvent } from '@nostr-dev-kit/ndk';
+    import { nicelyFormattedSatNumber } from '$lib/utils';
 
+    export let event: NDKEvent;
     export let note: App.Note | undefined = undefined;
     export let highlight: App.Highlight | undefined = undefined;
-
-    let eventId = note?.id || highlight?.id;
-
-    let zappedAmount: number = 0;
     let zaps;
+    let zappedAmount: number = 0;
 
-    onMount(() => {
-        zaps = ZapInterface.load({eventId});
-    });
+    if (event?.id) {
+        let eventId = event.id;
 
-    if ($zaps) {
+
+        let zaps;
+
+        onMount(() => {
+            zaps = ZapInterface.load({eventId});
+        });
+    }
+
+    $: if ($zaps) {
         zappedAmount = $zaps.reduce((acc: number, zap: App.Zap) => {
             return acc + zap.amount;
         }, 0);
     }
 </script>
 
-<button class="
-    text-slate-500 hover:text-orange-500
-    flex flex-row items-center gap-2
-" on:click={() => { openModal(ZapModal, { note, highlight }) }}>
-    <ZapIcon />
-    {zappedAmount}
-</button>
-<Tooltip  color="black">Zap</Tooltip>
+{#if event?.id}
+    <button class="
+        text-slate-500 hover:text-orange-500
+        flex flex-row items-center gap-2
+    " on:click={() => { openModal(ZapModal, { note, highlight }) }}>
+        <ZapIcon />
+        <div class="text-sm">{nicelyFormattedSatNumber(zappedAmount)}</div>
+    </button>
+    <Tooltip  color="black">Zap</Tooltip>
+{/if}

@@ -12,8 +12,7 @@
     import type { NostrEvent } from '@nostr-dev-kit/ndk/lib/src/events';
     import { generateEphemeralSigner, saveEphemeralSigner } from '$lib/signers/ephemeral';
 
-    let key;
-    let privateNote, privateEvent;
+    let privateNote;
 
     async function newNote() {
         const title = await prompt('Title?');

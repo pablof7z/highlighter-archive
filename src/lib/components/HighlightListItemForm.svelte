@@ -41,6 +41,8 @@
 
         if (articleEvent) {
             event.tags.push(articleEvent.tagReference());
+        } else if (highlight.url) {
+            event.tags.push(['r', highlight.url]);
         }
         event.tags.push(altTag(event));
         await event.sign();

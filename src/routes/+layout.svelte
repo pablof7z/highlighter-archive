@@ -3,6 +3,7 @@
     import { currentUser } from '$lib/store';
     import { onMount } from 'svelte';
     import { NDKNip07Signer } from "@nostr-dev-kit/ndk";
+    import { fetchFollowers } from '$lib/currentUser';
 
     // move to NDK's nip-07 signer
     async function tryToLoadNip07(delay = 0) {
@@ -17,6 +18,10 @@
                 $currentUser = await $ndk.signer.user();
                 $currentUser.ndk = $ndk;
                 console.log('currentUser', $currentUser);
+
+                if ($currentUser) {
+                    fetchFollowers();
+                }
 
                 $ndk = $ndk;
             } catch (e) {

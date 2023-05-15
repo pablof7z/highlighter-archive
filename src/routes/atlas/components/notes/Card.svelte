@@ -1,12 +1,12 @@
 <script lang="ts">
 	import CopyJson from './buttons/copy-json.svelte';
     import NoteInterface from '$lib/interfaces/notes';
-    import NoteContent from './content.svelte';
+    import NoteContent from '$lib/components/events/content.svelte';
     import Bookmark from '$lib/components/events/buttons/bookmark.svelte';
     import Zaps from '$lib/components/events/buttons/zaps.svelte';
     import Boost from '$lib/components/events/buttons/boost.svelte';
 
-    import ViewIcon from '$lib/icons/View.svelte';
+    import ExpandIcon from '$lib/icons/Expand.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
 
@@ -156,7 +156,7 @@
 
                     <div class="flex flex-row gap-4 items-center" on:click|stopPropagation>
                         <Bookmark {event}  />
-                        <Zaps {note}  />
+                        <Zaps {note} {event}  />
                         <Boost {note}  />
 
                             <button class="
@@ -212,7 +212,7 @@
     ">
         {#if showCompact}
             <button on:click={toggleCompactView}>
-                <ViewIcon />
+                <ExpandIcon />
             </button>
         {:else}
             <CopyJson {note} />

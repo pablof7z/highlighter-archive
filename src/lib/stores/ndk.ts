@@ -8,17 +8,17 @@ const ndk = writable(new NDK({
     explicitRelayUrls: [
         'wss://purplepag.es',
         'ws://localhost:8080',
-        // 'wss://nos.lol',
-        // 'wss://relay.f7z.io',
-        // 'wss://relay.damus.io',
-        // 'wss://nostr.mom',
-        // 'wss://nostr.terminus.money',
-        // 'wss://atlas.nostr.land/',
-        // 'wss://offchain.pub/'
+        'wss://nos.lol',
+        'wss://relay.f7z.io',
+        'wss://relay.damus.io',
+        'wss://nostr.mom',
+        'wss://nostr.terminus.money',
+        'wss://atlas.nostr.land/',
+        'wss://offchain.pub/'
     ],
-    devWriteRelayUrls: [
-        'ws://localhost:8080',
-    ],
+    // devWriteRelayUrls: [
+    //     'ws://localhost:8080',
+    // ],
     cacheAdapter: dexieCacheAdaper,
 }));
 

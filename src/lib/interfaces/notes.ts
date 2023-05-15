@@ -1,11 +1,10 @@
 import { get, get as getStore } from 'svelte/store';
 import ndkStore from '../stores/ndk';
-import {currentUser as currentUserStore} from '../store';
 import { liveQuery } from 'dexie';
 import { db } from '$lib/interfaces/db';
 import type NDK from '@nostr-dev-kit/ndk';
 import type { NDKEvent, NDKFilter, NDKUser } from '@nostr-dev-kit/ndk';
-import {nip19} from 'nostr-tools';
+import { filterForId } from '$lib/utils';
 
 function valueFromTag(event: NDKEvent, tag: string): string | undefined {
     const matchingTag = event.tags.find((t: string[]) => t[0] === tag);
@@ -38,7 +37,7 @@ const NoteInterface = {
 
     startStream: (opts: ILoadOpts = {}) => {
         let closeOnEose = false;
-        const filter: NDKFilter = {};
+        let filter: NDKFilter = {};
         if (opts.kind) {
             if (opts.kind !== null)
                 filter['kinds'] = [opts.kind];
@@ -58,6 +57,7 @@ const NoteInterface = {
         let articleReference: string | undefined;
 
         if (opts.articleId) {
+            filter = { ...filterForId(opts.articleId), ...filter };
             filter['#a'] = [opts.articleId];
         }
 

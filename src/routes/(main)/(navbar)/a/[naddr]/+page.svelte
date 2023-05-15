@@ -2,23 +2,32 @@
     import Reader from '$lib/components/articles/reader.svelte';
 
     import { page } from '$app/stores';
-    import ArticleInterface from '$lib/interfaces/article';
+    import ArticleInterface, { articleFromEvent } from '$lib/interfaces/article';
     import { onMount } from 'svelte';
     import MarkdownIt from 'markdown-it';
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import { openModal } from 'svelte-modals'
     import HighlightIntroModal from '$lib/modals/HighlightIntro.svelte';
     import ndk from '$lib/stores/ndk';
-    import { idFromNaddr } from '$lib/utils';
+    import { filterFromNaddr, idFromNaddr } from '$lib/utils';
+    import { nip19 } from 'nostr-tools';
 
     const { naddr } = $page.params;
-    const articleId = idFromNaddr(naddr);
+    const decoded = nip19.decode(naddr);
+    const { type } = decoded;
+    let articleId: string;
+    let articleEvent: NDKEvent;
+
+    switch (type) {
+        case 'note': articleId = decoded.data; break;
+        case 'nevent': articleId = decoded.data.id; break;
+        case 'article': articleId = idFromNaddr(naddr); break;
+    }
 
     let articles: any;
     let article: App.Article;
     let content: string = '';
     let unmarkedContent: string = '';
-    let articleEvent: NDKEvent;
 
     onMount(async () => {
         // check if the highlightintro modal has been displayed on localStorage
@@ -29,18 +38,34 @@
     });
 
     // Load article
-    $: if (!articles) {
-        articles = ArticleInterface.load({id: articleId});
+    $: if (type === 'note' || type === 'nevent') {
+        $ndk.fetchEvent({ids: [articleId]}).then(e => {
+            if (!e) return;
+            if (e.kind === 1) {
+                article = {
+                    id: e.id,
+                    title: "",
+                    tags: e.tags,
+                    publisher: e.pubkey,
+                    author: e.pubkey,
+                    content: e.content,
+                } as App.Article;
+                articleEvent = e;
+                content = e.content;
+            }
+        });
     }
 
-    $: if (!article && ($articles||[]).length > 0) {
-        article = ($articles || [])[0];
-        articleEvent = new NDKEvent($ndk, JSON.parse(article.event));
-
-        const md = new MarkdownIt();
-        md.linkify?.set();
-        unmarkedContent = md.render(article.content);
-        content = unmarkedContent;
+    $: if (type === 'naddr') {
+        $ndk.fetchEvent(filterFromNaddr(naddr)).then(e => {
+            if (!e) return;
+            articleEvent = e;
+            article = articleFromEvent(e);
+            const md = new MarkdownIt();
+            md.linkify?.set();
+            unmarkedContent = md.render(article.content);
+            content = unmarkedContent;
+        });
     }
 </script>
 

@@ -1,6 +1,6 @@
 import {Readability, isProbablyReaderable } from '@mozilla/readability';
 
-export async function fetchArticle(url: string) {
+export async function fetchArticle(url: string): Promise<App.Article | null> {
     // Fetch the HTML content of the URL and parse it with JSDOM
     const response = await fetch(`https://api.allorigins.win/get?url=${url}`);
     const json = await response.json();
@@ -17,5 +17,11 @@ export async function fetchArticle(url: string) {
 
     // Extract the main content using Readability
     const reader = new Readability(doc);
-    return reader.parse();
+    const article: App.Article | null = reader.parse() as App.Article | null;
+
+    if (!article) return null;
+
+    article.url = url;
+
+    return article;
 }

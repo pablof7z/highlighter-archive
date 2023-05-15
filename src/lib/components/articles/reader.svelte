@@ -1,31 +1,36 @@
 <script lang="ts">
     import HighlightInterface from '$lib/interfaces/highlights';
     import NoteInterface from '$lib/interfaces/notes';
-    // import Widget from '../../../../Widget.svelte';
-    import Avatar from '$lib/components/Avatar.svelte';
-    import Name from '$lib/components/Name.svelte';
-    import Article from '$lib/components/Article.svelte';
     import type { NDKEvent } from '@nostr-dev-kit/ndk';
     import type { NDKSubscription } from '@nostr-dev-kit/ndk';
     import ScopeDropdown from '$lib/components/ScopeDropdown.svelte';
     import HighlightList from '$lib/components/HighlightList.svelte';
     import HighlightListItemForm from '$lib/components/HighlightListItemForm.svelte';
     import { currentUser, currentUserFollowPubkeys, currentScope } from '$lib/store';
-    import ndk from "$lib/stores/ndk";
-    import HighlightWrapper from '$lib/components/HighlightWrapper.svelte';
     import { fade } from 'svelte/transition';
     import { fetchFollowers } from '$lib/currentUser';
+    import Avatar from '../Avatar.svelte';
+    import Name from '../Name.svelte';
+    import HighlightWrapper from '../HighlightWrapper.svelte';
+    import Article from '../Article.svelte';
+    import CardContent from '$lib/components/events/content.svelte';
 
-    export let article: App.Article;
+    export let article: App.Article | undefined = undefined;
+    export let eventId: string | undefined = undefined;
     export let articleEvent: NDKEvent;
     export let content: string;
     export let unmarkedContent: string;
 
     let articleId: string;
+    let articleUrl: string;
 
     $: if (article?.id && article?.id !== articleId) {
         articleId = article.id;
         notes = NoteInterface.load({articleId});
+    }
+
+    $: if (!articleUrl && !article?.id && article?.url) {
+        articleUrl = article.url
     }
 
     let scope = $currentScope.label;
@@ -58,8 +63,11 @@
 
         // If pubkeys has been explicitly set to a value or undefined
         if (pubkeys !== null) {
-            highlightFilter = {pubkeys, articleId};
+            highlightFilter = {pubkeys};
         }
+
+        if (articleId) highlightFilter.articleId = articleId;
+        if (articleUrl) highlightFilter.url = articleUrl;
     }
 
     // Apply filter when it's ready
@@ -81,7 +89,10 @@
     function markContent() {
         content = unmarkedContent;
 
+        if (!content) return;
+
         for (const highlight of $highlights||[]) {
+            if (!highlight.content) continue;
             // if (replacedHighlights[highlight.id!]) continue;
             content = content.replace(highlight.content, `<mark data-highlight-id="${highlight.id}">${highlight.content}</mark>`);
             // replacedHighlights[highlight.id!] = true;
@@ -96,13 +107,9 @@
         selection = selection.trim();
         sentence = sentence.trim();
 
-        console.log({selection, sentence, paragraph});
-
-
         if (selection.length >= sentence.length) {
             sentence = undefined;
         }
-
 
         if (selection.trim() === '') return;
 
@@ -113,6 +120,7 @@
                 content: selection,
                 pubkey: $currentUser?.hexpubkey()!,
                 scope,
+                url: articleUrl,
                 context: sentence,
             };
         }
@@ -183,7 +191,11 @@
             <HighlightWrapper on:selectionchange={onSelectionChange}>
                 <article class="my-6 font-serif">
                     <Article>
-                        {@html content}
+                        <CardContent
+                            note={content}
+                            tags={article.tags}
+                            addNewLines={articleEvent?.kind !== 30023}
+                        />
                     </Article>
                 </article>
             </HighlightWrapper>

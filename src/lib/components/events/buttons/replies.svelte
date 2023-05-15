@@ -18,6 +18,6 @@
     flex flex-row items-center gap-2
 " on:click={() => { openModal(ReplyModal, { event, note, highlight }) }}>
     <CommentIcon />
-    {replies.length}
+    <div class="text-sm">{replies.length}</div>
 </button>
 <Tooltip  color="black">Reply</Tooltip>

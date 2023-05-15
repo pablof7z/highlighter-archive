@@ -56,6 +56,6 @@
 
     :global(article mark) {
         color: black;
-        padding: 0.25rem;
+        padding: 1px;
     }
 </style>

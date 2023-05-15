@@ -5,18 +5,16 @@
     import Name from "../Name.svelte";
     import Avatar from "../Avatar.svelte";
 
-    import BookmarkIcon from '$lib/icons/Bookmark.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
+    import ndk from "$lib/stores/ndk";
 
     import HighlightContent from "./content.svelte";
 
     import { Tooltip } from "flowbite-svelte";
-    import { openModal } from 'svelte-modals'
-    import BookmarkModal from '$lib/modals/Bookmark.svelte';
-    import ndk from "$lib/stores/ndk";
     import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
     import NoteInterface from "$lib/interfaces/notes";
+  import Reply from '$lib/modals/Reply.svelte';
 
     export let highlight: App.Highlight;
     export let skipHighlighter = false;
@@ -75,9 +73,9 @@
                     <CommentIcon />
                     {($replies||[]).length}
                 </button>
-                <Tooltip  color="black">Discuss</Tooltip>
+                <Tooltip color="black">Discuss</Tooltip>
 
-                <Zaps {highlight} />
+                <Zaps {highlight} event={highlightEvent} />
 
                 <a href={`/e/${highlightEvent.encode()}`} class="
                     text-slate-500 hover:text-orange-500

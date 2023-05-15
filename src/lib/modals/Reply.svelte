@@ -26,6 +26,7 @@
                 ]
             } as NostrEvent)
             await commentEvent.publish();
+            closeModal();
         }
     }
 </script>

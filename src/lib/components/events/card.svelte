@@ -60,10 +60,14 @@
             <div class="flex flex-row justify-between items-start relative">
                 <div class="flex flex-col gap-2">
                     <div class="flex flex-row gap-4 items-start">
-                        <Avatar pubkey={userPubkey} klass="h-8" />
-                        <div class="text-lg">
-                            <Name pubkey={userPubkey} />
-                        </div>
+                        {#if $$slots.header}
+                            <slot name="header" />
+                        {:else}
+                            <Avatar pubkey={userPubkey} klass="h-8" />
+                            <div class="text-lg">
+                                <Name pubkey={userPubkey} />
+                            </div>
+                        {/if}
                     </div>
                 </div>
 
@@ -107,6 +111,7 @@
                 <CardContent
                     note={event.content}
                     tags={event.tags}
+                    kind={event.kind}
                 />
             </div>
         {/if}
@@ -154,7 +159,7 @@
                     ">
                         <BookmarkButton {event} />
 
-                        <ZapsButton {highlight} />
+                        <ZapsButton {highlight} {event} />
 
                         <BoostButton {note} {highlight} {event} />
 
@@ -184,11 +189,11 @@
         {/if}
     </div>
 
-    {#if expandReplies}
-        <div class="ml-6">
-            {#each replies as reply}
+    {#if expandReplies && replies.length > 0}
+        {#each replies as reply}
+            <div class="ml-6">
                 <NoteCard note={reply} />
-            {/each}
-        </div>
+            </div>
+        {/each}
     {/if}
 </div>

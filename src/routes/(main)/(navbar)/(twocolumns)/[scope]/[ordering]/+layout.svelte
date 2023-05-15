@@ -2,7 +2,7 @@
     import { page } from '$app/stores';
     import ScopeDropdown from '$lib/components/ScopeDropdown.svelte';
 
-    let {scope, ordering } = $page.params;
+    let {scope, ordering} = $page.params;
 
     $: {
         scope = $page.params.scope;

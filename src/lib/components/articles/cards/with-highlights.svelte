@@ -7,6 +7,8 @@
     import InlineHighlight from "$lib/components/highlights/inline.svelte";
     import { NDKEvent } from "@nostr-dev-kit/ndk";
     import ndk from "$lib/stores/ndk";
+    import NoteInterface from "$lib/interfaces/notes";
+    import { nip19 } from 'nostr-tools';
 
     /**
      * ID of the article to load
@@ -30,17 +32,23 @@
      */
     export let skipHighlighter: boolean = false;
 
+    let note: Observable<App.Note[]> | undefined;
     let article: Observable<App.Article[]> | undefined;
     let articleHighlights: Observable<App.Highlight[]> | undefined;
     let articleEvent: NDKEvent;
 
     let highlightPubkeys: Set<string> = new Set();
 
-
     $: if (id !== prevId) {
         prevId = id;
-        console.log('calling into loading article 3', id)
-        article = ArticleInterface.load({id});
+
+        const isArticle = !!id.match(/:/);
+
+        if (isArticle) {
+            article = ArticleInterface.load({id});
+        } else {
+            note = NoteInterface.load({ids:[id]})
+        }
 
         // load all highlights for this article
         const highlightFilter = {
@@ -71,8 +79,8 @@
     }
 </script>
 
-{#if $article && $article.length > 0}
-    <div class="flex flex-col gap-2">
+<div class="flex flex-col gap-2">
+    {#if ($article && $article.length > 0)}
         <div class="flex flex-row items-center gap-4 justify-between">
             <a
                 href={linkTo($article[0])}
@@ -89,7 +97,15 @@
         </div>
 
         <AvatarWithName pubkey={$article[0].author} />
-    </div>
+    {:else if ($note && $note.length > 0)}
+        <a href="/a/{nip19.noteEncode($note[0].id)}" class="flex flex-row items-center gap-4 text-orange-500">
+            Note
+            from <AvatarWithName pubkey={$note[0].pubkey} />
+        </a>
+    {/if}
+
+
+</div>
 
     {#if $articleHighlights && $articleHighlights.length > 0}
         <div class="ml-6">
@@ -119,4 +135,3 @@
             </div>
         {/if}
     {/if}
-{/if}

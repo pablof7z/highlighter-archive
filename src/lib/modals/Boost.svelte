@@ -5,12 +5,11 @@
     import { NDKEvent, type NostrEvent } from '@nostr-dev-kit/ndk';
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';
+    import GenericEventCard from '$lib/components/events/generic/card.svelte';
     import HighlightCard from '$lib/components/highlights/card.svelte';
     import RoundedButton from '../../routes/(main)/components/RoundedButton.svelte';
 
-    export let event: NDKEvent;
-    export let highlight: App.Highlight;
-    export let article: App.Article;
+    export let id: string;
 
     let comment: string;
 
@@ -50,9 +49,8 @@
             <h2 class="text-zinc-500 font-semibold text-base uppercase">REPOST</h2>
 
             <div class="flex flex-col gap-8">
-                <HighlightCard
-                    {highlight}
-                    {article}
+                <GenericEventCard
+                    {id}
                     skipTitle={true}
                     skipButtons={true}
                 />
@@ -85,11 +83,5 @@
 
         /* allow click-through to backdrop */
         pointer-events: none;
-    }
-
-    .actions {
-        margin-top: 32px;
-        display: flex;
-        justify-content: flex-end;
     }
 </style>

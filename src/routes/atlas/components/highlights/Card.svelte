@@ -10,7 +10,6 @@
     import ViewIcon from '$lib/icons/View.svelte';
     import ZapIcon from '$lib/icons/Zap.svelte';
     import CommentIcon from '$lib/icons/Comment.svelte';
-    import BookmarkIcon from '$lib/icons/Bookmark.svelte';
     import LinkIcon from '$lib/icons/Link.svelte';
 
     import Bookmark from '$lib/components/events/buttons/bookmark.svelte';
@@ -24,7 +23,7 @@
     import { NDKEvent } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import Comment from '$lib/components/Comment.svelte';
-    import Note from '$lib/components/Note.svelte';
+    import Note from '$lib/components/notes/card.svelte';
 
     import ZapModal from '$lib/modals/Zap.svelte';
     import BookmarkModal from '$lib/modals/Bookmark.svelte';

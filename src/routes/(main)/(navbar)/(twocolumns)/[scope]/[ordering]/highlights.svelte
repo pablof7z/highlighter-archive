@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentUser, currentUserFollowPubkeys } from '$lib/store';
+    import { currentUser, currentScope } from '$lib/store';
     import type { Observable } from "dexie";
     import type { NDKSubscription } from '@nostr-dev-kit/ndk';
     import HighlightInterface from '$lib/interfaces/highlights';
@@ -18,7 +18,6 @@
     export let pubkey: string | undefined = undefined;
 
     let prevScope: string;
-    let prevPubkey: string;
 
     let pubkeys: string[] | undefined = undefined;
 
@@ -30,15 +29,8 @@
                 if (!pubkey) throw new Error('pubkey is required for scope "pubkey"');
                 pubkeys = [pubkey];
                 break;
-            case 'personal':
-                pubkeys = [$currentUser?.hexpubkey()!];
-                break;
-            case 'network':
-                pubkeys = $currentUserFollowPubkeys;
-                break;
-            case 'global':
-                pubkeys = undefined;
-                break;
+            default:
+                pubkeys = $currentScope.pubkeys;
         }
 
         loadArticlesGroupedByHighlights({pubkeys});
@@ -52,6 +44,7 @@
             limit: 500,
             ...filter
         };
+        console.log({filter});
 
         items = HighlightInterface.load(filter);
 		subs = HighlightInterface.startStream(filter);

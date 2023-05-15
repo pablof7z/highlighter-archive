@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { fetchArticle } from '$lib/article';
     import EventCard from '$lib/components/events/card.svelte';
     import HighlightContent from '$lib/components/highlights/content.svelte';
 
@@ -6,6 +7,8 @@
     import { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import type { ILoadOpts } from '$lib/interfaces/highlights';
+  import ArticleInterface from '$lib/interfaces/article';
+  import type { Observable } from 'dexie';
 
     export let article: App.Article | undefined = undefined;
     export let highlight: App.Highlight;
@@ -16,12 +19,9 @@
     export let disableClick: boolean = false;
     let prevHighlightId: string | undefined = undefined;
 
-    let domain: string | undefined;
-    let pubkey: string;
     let event: NDKEvent;
     let articleLink: string;
     let naddr: string;
-    let highlightNoteId = '';
 
     function onContentClick(e) {
         if (disableClick) return;
@@ -44,19 +44,34 @@
         }
     }
 
+    let articles: Observable<App.Article[]> | undefined = undefined;
+
+    $: console.log(`highlight?.articleId`, highlight?.articleId)
+
+    $: if (highlight?.articleId && !articles) {
+        console.log(`fetch artcile ${highlight.articleId}`);
+        articles = ArticleInterface.load({id: highlight.articleId});
+    }
+
+    $: if (articles && $articles && $articles.length > 0) {
+        article = $articles[0];
+    }
+
     $: {
         if (prevHighlightId !== highlight.id && highlight.id) {
             prevHighlightId = highlight.id;
 
-            highlightNoteId = nip19.noteEncode(highlight.id);
-
             if (highlight.articleId) {
-                const [kind, pubkey, identifier] = highlight.articleId.split(':');
-                naddr = nip19.naddrEncode({
-                    kind: parseInt(kind),
-                    pubkey,
-                    identifier
-                })
+                if (highlight.articleId.match(/:/)) {
+                    const [kind, pubkey, identifier] = highlight.articleId.split(':');
+                    naddr = nip19.naddrEncode({
+                        kind: parseInt(kind),
+                        pubkey,
+                        identifier
+                    })
+                } else {
+                    naddr = nip19.noteEncode(highlight.articleId);
+                }
                 articleLink = `/a/${naddr}`;
             } else {
                 // see if this highlight.event has a p tag
@@ -87,10 +102,6 @@
                 console.error(e);
             }
         }
-
-        pubkey = highlight.pubkey;
-
-        domain = highlight.url && new URL(highlight.url).hostname;
     }
 
 </script>
@@ -103,10 +114,16 @@
     skipHeader={skipTitle}
     {skipFooter}
 >
+    <div slot="header">
+        <div class="text-xl font-semibold truncate">
+            {article?.title||highlight.url||highlight.id||'untitled'}
+        </div>
+    </div>
+
     <a href={articleLink} on:click={onContentClick} class="
-    leading-relaxed h-full flex flex-col
-    py-2
-    overflow-auto
+        leading-relaxed h-full flex flex-col
+        py-2
+        overflow-auto
     ">
         <div class="border-l-4 border-orange-300 pl-4 py-4">
             <HighlightContent {highlight} />
