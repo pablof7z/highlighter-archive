@@ -6,7 +6,6 @@
     import { closeModal } from 'svelte-modals';
     import { fade } from 'svelte/transition';
     import NoteCard from '$lib/components/notes/card.svelte';
-    import HighlightCard from '$lib/components/highlights/card.svelte';
     import RoundedButton from '../../routes/(main)/components/RoundedButton.svelte';
 
     export let event: NDKEvent;
@@ -56,6 +55,7 @@
                     {note}
                     skipTitle={true}
                     skipButtons={true}
+                    skipReplies={true}
                 />
 
                 <ClickToAddComment bind:value={comment} show={true} />

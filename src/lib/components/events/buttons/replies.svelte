@@ -20,4 +20,4 @@
     <CommentIcon />
     <div class="text-sm">{replies.length}</div>
 </button>
-<Tooltip  color="black">Reply</Tooltip>
+<Tooltip color="black">Reply</Tooltip>

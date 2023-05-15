@@ -94,12 +94,11 @@
     }
 
     function shouldDisplayQuote(highlight: App.Highlight, quotes: App.Note[]) {
-        return true;
-        // if (!quotes || quotes.length === 0) {
-        //     return true;
-        // }
+        if (!quotes || quotes.length !== 1) {
+            return true;
+        }
 
-
+        return false;
     }
 </script>
 
@@ -107,7 +106,7 @@
     flex flex-col
     {collapsedQuotes? '' : 'gap-8'}
 ">
-    {#if shouldDisplayQuote(highlight, $quotes)}
+    {#if shouldDisplayQuote(highlight, $quotes||[])}
         <div class="text-lg">
             <HighlightCard
                 {event}
@@ -117,37 +116,42 @@
                 {disableClick}
             />
         </div>
-    <!-- {:else if shouldDisplayHighlighterQuote(highlight, $quotes)} -->
-    {/if}
 
-    {#if ($quotes||[]).length > 0}
-        {#if collapsedQuotes}
-            <div class="px-8 py-3">
-                <div class="flex flex-row gap-2 items-center">
-                    <div class="isolate flex -space-x-2 overflow-hidden">
-                        {#each Array.from(new Set(quotePubkeys)).slice(0, 6) as quotePubkey}
-                            <div class="relative z-30 inline-block h-8 w-8 rounded-full ring-2 ring-white">
-                                <Avatar pubkey={quotePubkey} />
-                            </div>
-                        {/each}
+        {#if ($quotes||[]).length > 0}
+            {#if collapsedQuotes}
+                <div class="px-8 py-3">
+                    <div class="flex flex-row gap-2 items-center">
+                        <div class="isolate flex -space-x-2 overflow-hidden">
+                            {#each Array.from(new Set(quotePubkeys)).slice(0, 6) as quotePubkey}
+                                <div class="relative z-30 inline-block h-8 w-8 rounded-full ring-2 ring-white">
+                                    <Avatar pubkey={quotePubkey} />
+                                </div>
+                            {/each}
+                        </div>
+
+                        <button
+                            class="text-xs font-medium text-zinc-600 hover:text-zinc-500"
+                            on:click={() => { collapsedQuotes = false }}>
+                            Show {$quotes.length} notes...
+                        </button>
                     </div>
-
-                    <button
-                        class="text-xs font-medium text-zinc-600 hover:text-zinc-500"
-                        on:click={() => { collapsedQuotes = false }}>
-                        Show {$quotes.length} notes...
-                    </button>
                 </div>
-            </div>
-        {:else}
-            <div class="ml-6 flex flex-col gap-6 quote-card">
-                {#each ($quotes||[]) as quote}
-                    <div class="text-lg">
-                        <NoteCard note={quote} {highlight} />
-                    </div>
-                {/each}
-            </div>
+            {:else}
+                <div class="ml-6 flex flex-col gap-6 quote-card">
+                    {#each ($quotes||[]) as quote}
+                        <div class="text-lg">
+                            <NoteCard note={quote} {highlight} />
+                        </div>
+                    {/each}
+                </div>
+            {/if}
         {/if}
+    {:else}
+        {#each ($quotes||[]) as quote}
+            <div class="text-lg">
+                <NoteCard note={quote} {highlight} />
+            </div>
+        {/each}
     {/if}
 </div>
 
