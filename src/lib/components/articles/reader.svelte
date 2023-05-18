@@ -142,9 +142,11 @@
         bg-white rounded-xl w-7/12
         overflow-auto
     ">
-        {#if article}
-            <!-- Title -->
-            <h1 class="text-2xl font-bold font-sans leading-normal text-left">{article.title}</h1>
+        {#if article || articleEvent}
+            {#if article?.title}
+                <!-- Title -->
+                <h1 class="text-2xl font-bold font-sans leading-normal text-left">{article?.title}</h1>
+            {/if}
 
             <div class="flex flex-row justify-between">
                 <!-- Author / URL -->
@@ -191,11 +193,15 @@
             <HighlightWrapper on:selectionchange={onSelectionChange}>
                 <article class="my-6 font-serif">
                     <Article>
-                        <CardContent
-                            note={content}
-                            tags={article.tags}
-                            addNewLines={articleEvent?.kind !== 30023}
-                        />
+                        {#if $$slots.default}
+                            <slot />
+                        {:else}
+                            <CardContent
+                                note={content}
+                                tags={article.tags}
+                                addNewLines={articleEvent?.kind !== 30023}
+                            />
+                        {/if}
                     </Article>
                 </article>
             </HighlightWrapper>

@@ -6,14 +6,13 @@
     import Avatar from '$lib/components/Avatar.svelte';
 
     import ndk from '$lib/stores/ndk';
-    import { NDKEvent, NDKUser } from '@nostr-dev-kit/ndk';
+    import { NDKEvent } from '@nostr-dev-kit/ndk';
     import {nip19} from 'nostr-tools';
     import NoteCard from '$lib/components/notes/card.svelte';
     import type { ILoadOpts } from '$lib/interfaces/highlights';
+    import { currentScope } from '$lib/store';
 
-    export let article: App.Article | undefined = undefined;
     export let highlight: App.Highlight;
-    export let skipUrl: boolean = false;
     export let skipTitle: boolean = false;
     export let skipButtons: boolean = false;
     export let disableClick: boolean = false;
@@ -33,7 +32,7 @@
 
     // Set the quote pubkeys
     $: if ($quotes && $quotes.length > 0 && quotes.length != quotePubkeys.length) {
-        quotePubkeys = $quotes.map(q => q.pubkey);
+        quotePubkeys = $quotes.map((q: App.Note) => q.pubkey);
     }
 
     $: {
@@ -57,7 +56,7 @@
                     naddr = nip19.noteEncode(highlight.articleId);
                 }
                 articleLink = `/a/${naddr}`;
-            } else {
+            } else if (highlight.event) {
                 // see if this highlight.event has a p tag
                 try {
                     const event = new NDKEvent(undefined, JSON.parse(highlight.event));
@@ -72,11 +71,11 @@
                 }
             }
 
-            const pubkeyFilter: ILoadOpts = {}; // XXX filter by selected pubkeys
+            const pubkeyFilter: ILoadOpts = {};
 
-            // if ($currentScope.pubkeys) {
-            //     pubkeyFilter.pubkeys = $currentScope.pubkeys;
-            // }
+            if ($currentScope.pubkeys) {
+                pubkeyFilter.pubkeys = $currentScope.pubkeys;
+            }
 
             replies = NoteInterface.load({ replies: [highlight.id], ...pubkeyFilter });
             quotes = NoteInterface.load({ quotes: [highlight.id], ...pubkeyFilter });

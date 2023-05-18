@@ -33,6 +33,8 @@
                 pubkeys = $currentScope.pubkeys;
         }
 
+        console.log(`current scope pubkeys has ${$currentScope.pubkeys?.length}`)
+
         loadArticlesGroupedByHighlights({pubkeys});
     }
 

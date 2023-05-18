@@ -11,13 +11,23 @@
 </script>
 
 <button class="
-    bg-zinc-100 px-3 py-2 rounded-xl
-    shadow
+    px-3 py-2
     text-sm
     font-semibold
     flex flex-row items-center gap-2
 ">
-    <div class="font-normal">{value}</div>
+    <div class="font-normal">
+        Publishing as
+        {#if value === 'Public'}
+            <Name pubkey={$currentUser?.hexpubkey()} />
+        {:else if value === 'Delegated'}
+            Public (as {delegatedName})
+        {:else if value === 'Secret'}
+            Secret
+        {:else}
+            {value}
+        {/if}
+    </div>
     <div class="w-4 h-4"><ChevronDownIcon /></div>
 </button>
 <Dropdown class="w-96 space-y-1 rounded-xl shadow-lg z-50" placement="right-start">

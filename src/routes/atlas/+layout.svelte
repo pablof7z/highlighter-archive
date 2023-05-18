@@ -69,9 +69,9 @@
         <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
             <div class="flex h-16 shrink-0 items-center flex-row gap-2 font-bold tracking-wider text-zinc-800">
                 <GlobalIcon />
-                <a href="/atlas" class="flex flex-row gap-1">
-                    <span class="text-zinc-900">ATLAS</span>
-                    <span class="text-zinc-400 font-light">Notes</span>
+                <a href="/atlas" class="flex flex-row">
+                    <span class="text-zinc-400 font-light">my</span>
+                    <span class="text-zinc-900 uppercase">Highlighter</span>
                     <span class="text-orange-500 text-xs font-semibold tracking-tight">ALPHA</span>
                 </a>
             </div>

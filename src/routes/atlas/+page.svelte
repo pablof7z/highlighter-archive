@@ -21,5 +21,11 @@
             The fact that Atlas is <b class="text-orange-500">alpha</b> software can't be oversated;
             don't expect a fully functional product yet.
         </p>
+
+        <div class="text-2xl font-semibold">Some things you can do with Atlas</div>
+
+        <p>
+            Organize your highlights that you have marked from highlighter.com
+        </p>
     </div>
 </div>

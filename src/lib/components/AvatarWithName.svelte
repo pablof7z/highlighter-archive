@@ -32,7 +32,9 @@
             <div class="text-xs text-gray-500 truncate">
                 {#if subtitle}
                     {subtitle}
-                {:else}
+                {:else if $$slots.bio}
+                    <slot name="bio" />
+                {:else if userProfile?.about}
                     {userProfile?.about?.slice(0, 50)}
                 {/if}
             </div>

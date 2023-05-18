@@ -120,9 +120,7 @@
         py-2
         overflow-auto
     ">
-        <div class="border-l-4 border-orange-300 pl-4 py-4">
-            <HighlightContent {highlight} />
-        </div>
+        <HighlightContent {highlight} />
     </a>
 </EventCard>
 

@@ -74,8 +74,12 @@
         }
     }
 
-    function linkTo(article: App.Article) {
-        return `/a/${articleEvent.encode()}`;
+    function linkTo(article?: App.Article, note?: App.Note) {
+        if (article) {
+            return `/a/${articleEvent.encode()}`;
+        } else if (note) {
+            return `/a/${nip19.noteEncode(note.id)}`;
+        }
     }
 </script>
 
@@ -98,25 +102,24 @@
 
         <AvatarWithName pubkey={$article[0].author} />
     {:else if ($note && $note.length > 0)}
-        <a href="/a/{nip19.noteEncode($note[0].id)}" class="flex flex-row items-center gap-4 text-orange-500">
+        <a href={linkTo(undefined, $note[0])} class="flex flex-row items-center gap-4 text-orange-500">
             Note
             from <AvatarWithName pubkey={$note[0].pubkey} />
         </a>
     {/if}
-
-
 </div>
 
     {#if $articleHighlights && $articleHighlights.length > 0}
         <div class="ml-6">
-            <ul role="list" class="divide-y divide-gray-200">
+            <ul role="list" class="flex flex-col gap-4 divide-y divide-gray-200">
                 {#each $articleHighlights.slice(0, maxHighlightCountToShow) as highlight}
-                    <InlineHighlight {highlight} {skipHighlighter} />
+                    <InlineHighlight {highlight} {skipHighlighter} href={linkTo($article && $article[0], $note && $note[0])} />
                 {/each}
             </ul>
         </div>
-        {#if $articleHighlights.length > maxHighlightCountToShow}
-            <div class="bg-zinc-50 -mx-8 -mb-4 px-8 py-3">
+
+        <div class="bg-zinc-50 -mx-8 -mb-4 px-8 py-3 flex flex-row items-center justify-between">
+            {#if $articleHighlights.length > maxHighlightCountToShow}
                 <div class="flex flex-row gap-2 items-center">
                     <div class="isolate flex -space-x-2 overflow-hidden">
                         {#each Array.from(highlightPubkeys).slice(0, 6) as highlightPubkey}
@@ -132,6 +135,15 @@
                         {$articleHighlights.length-maxHighlightCountToShow} more highlights...
                     </button>
                 </div>
-            </div>
-        {/if}
+            {:else}
+                <div></div>
+            {/if}
+
+            <a class="
+                text-sm
+                text-zinc-600 font-semibold
+            " href={linkTo(($article && $article[0]), ($note && $note[0]))}>
+                Go to article
+            </a>
+        </div>
     {/if}

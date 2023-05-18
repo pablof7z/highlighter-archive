@@ -35,12 +35,14 @@ const EncryptedNoteInterface = {
             filter['authors'] = [opts.recipient];
             filter['#p'] = [opts.recipient];
         }
+        console.log(filter);
 
         const ndk: NDK = getStore(ndkStore);
 
         const subs = ndk.subscribe(filter, { closeOnEose: false, groupableDelay: 500 });
 
         subs.on('event', async (event: NDKEvent) => {
+            console.log('got event', event);
             try {
                 const isAtlasMessage = valueFromTag(event, 'client') === 'atlas';
 

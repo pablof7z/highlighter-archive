@@ -6,6 +6,7 @@
     import 'bytemd/dist/index.css';
     import { filterFromNaddr, idFromNaddr } from '$lib/utils';
     import { onMount } from 'svelte';
+  import RoundedButton from '../../../(main)/components/RoundedButton.svelte';
 
     export let event: NDKEvent;
     export let signer: NDKPrivateKeySigner;
@@ -30,9 +31,14 @@
         console.log(`signer private key`, signer.privateKey, signerUser.hexpubkey());
 
 
-        const filter = filterFromNaddr(event.content.event);
-        console.log(filter);
-        longFormEvent = await $ndk.fetchEvent(filter);
+        try {
+            const filter = filterFromNaddr(event.content.event);
+            console.log(filter);
+            longFormEvent = await $ndk.fetchEvent(filter);
+        } catch (e) {
+            console.error(e);
+            return;
+        }
 
         console.log(longFormEvent, signer);
 
@@ -67,9 +73,6 @@
     <Editor bind:value={value}  {plugins} on:change={handleChange} />
 </div>
 
-
-{value}
-
-{JSON.stringify(event.content)}
-
-<button on:click={save}>Save</button>
+<div class="w-24">
+    <RoundedButton on:click={save}>Save</RoundedButton>
+</div>

@@ -8,10 +8,11 @@
     import NoteInterface from '$lib/interfaces/notes';
 
     export let note: App.Note;
-    export let highlight: App.Note | App.Highlight;
+    export let highlight: App.Note | App.Highlight | undefined = undefined;
     export let event: NDKEvent | undefined = undefined;
     export let skipButtons = false;
     export let skipReplies = false;
+    export let expandReplies = true;
 
     if (!event) event = new NDKEvent($ndk, JSON.parse(note.event));
 
@@ -37,6 +38,6 @@
     skipHeader={true}
     {skipButtons}
     replies={($replies||[])}
-    expandReplies={true}
+    {expandReplies}
 >
 </EventCard>

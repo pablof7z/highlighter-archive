@@ -93,7 +93,7 @@
                             <CopyIcon />
                         {/if}
                     </button>
-                    <Tooltip  color="black">
+                    <Tooltip color="black">
                         Copy highlight Nostr ID
                     </Tooltip>
                 </div>
@@ -189,11 +189,21 @@
         {/if}
     </div>
 
-    {#if expandReplies && replies.length > 0}
-        {#each replies as reply}
-            <div class="ml-6">
-                <NoteCard note={reply} />
-            </div>
-        {/each}
+    {#if replies?.length > 0}
+        {#if !expandReplies}
+            {#each replies as reply}
+                <div class="ml-6">
+                    <NoteCard note={reply} {expandReplies} />
+                </div>
+            {/each}
+        {:else}
+            <button class="
+                text-base text-left text-orange-500 -mt-4
+                font-semibold
+                px-4
+            " on:click={() => { expandReplies = false }}>
+                View replies...
+            </button>
+        {/if}
     {/if}
 </div>

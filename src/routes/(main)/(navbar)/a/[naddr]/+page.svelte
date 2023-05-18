@@ -1,11 +1,12 @@
 <script lang="ts">
+	import GenericEventCard from '$lib/components/events/generic/card.svelte';
     import Reader from '$lib/components/articles/reader.svelte';
 
     import { page } from '$app/stores';
     import ArticleInterface, { articleFromEvent } from '$lib/interfaces/article';
     import { onMount } from 'svelte';
     import MarkdownIt from 'markdown-it';
-    import { NDKEvent } from '@nostr-dev-kit/ndk';
+    import type { NDKEvent } from '@nostr-dev-kit/ndk';
     import { openModal } from 'svelte-modals'
     import HighlightIntroModal from '$lib/modals/HighlightIntro.svelte';
     import ndk from '$lib/stores/ndk';
@@ -18,13 +19,14 @@
     let articleId: string;
     let articleEvent: NDKEvent;
 
+    let loadedId: string;
+
     switch (type) {
-        case 'note': articleId = decoded.data; break;
+        case 'note': articleId = decoded.data as string; break;
         case 'nevent': articleId = decoded.data.id; break;
-        case 'article': articleId = idFromNaddr(naddr); break;
+        case 'naddr': articleId = idFromNaddr(naddr); break;
     }
 
-    let articles: any;
     let article: App.Article;
     let content: string = '';
     let unmarkedContent: string = '';
@@ -38,7 +40,8 @@
     });
 
     // Load article
-    $: if (type === 'note' || type === 'nevent') {
+    $: if (type === 'note' || type === 'nevent' && !article) {
+        loadedId = articleId;
         $ndk.fetchEvent({ids: [articleId]}).then(e => {
             if (!e) return;
             if (e.kind === 1) {
@@ -52,11 +55,14 @@
                 } as App.Article;
                 articleEvent = e;
                 content = e.content;
+            } else {
+                articleEvent = e;
             }
         });
     }
 
-    $: if (type === 'naddr') {
+    $: if (type === 'naddr' && !loadedId) {
+        loadedId = articleId;
         $ndk.fetchEvent(filterFromNaddr(naddr)).then(e => {
             if (!e) return;
             articleEvent = e;
@@ -76,4 +82,12 @@
         {unmarkedContent}
         {articleEvent}
     />
+{:else if articleEvent}
+    <Reader
+        {content}
+        {unmarkedContent}
+        {articleEvent}
+    >
+        <GenericEventCard event={articleEvent} />
+    </Reader>
 {/if}

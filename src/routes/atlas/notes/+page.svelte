@@ -52,21 +52,27 @@
             encryptedNotes = EncryptedNoteInterface.load({ recipient: $currentUser!.hexpubkey() });
         }
 
+        console.log('encrypted notes', $encryptedNotes?.length)
+
         if ($encryptedNotes && $encryptedNotes.length > 0 && Object.keys(decryptedNotes).length < $encryptedNotes.length) {
             setTimeout(async () => {
                 for (const note of $encryptedNotes) {
-                    if (note.isAtlasMessage) {
-                        if (!decryptedNotes[note.id]) {
-                            const eventJSON = JSON.parse(note.event);
-                            const event = new NDKEvent($ndk, eventJSON);
-                            await event.decrypt($currentUser!);
-                            event.content = JSON.parse(event.content);
+                    try {
+                        if (note.isAtlasMessage) {
+                            if (!decryptedNotes[note.id]) {
+                                const eventJSON = JSON.parse(note.event);
+                                const event = new NDKEvent($ndk, eventJSON);
+                                await event.decrypt($currentUser!);
+                                event.content = JSON.parse(event.content);
 
-                            decryptedNotes[note.id] = event;
+                                decryptedNotes[note.id] = event;
 
+                            }
+                        } else {
+                            decryptedNotes[note.id] = null;
                         }
-                    } else {
-                        decryptedNotes[note.id] = null;
+                    } catch (e) {
+                        console.error(e);
                     }
                 }
 

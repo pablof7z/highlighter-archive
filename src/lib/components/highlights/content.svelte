@@ -15,4 +15,6 @@
     }
 </script>
 
-{@html contextWithHighlight}
+<div class="border-l-4 border-orange-300 pl-4 py-4">
+    {@html contextWithHighlight}
+</div>

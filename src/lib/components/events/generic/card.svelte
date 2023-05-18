@@ -6,24 +6,29 @@
     import ndk from '$lib/stores/ndk';
     import { nip19 } from 'nostr-tools';
     import { createEventDispatcher } from 'svelte';
-    import type { NDKEvent } from '@nostr-dev-kit/ndk';
+    import type { NDKEvent, NDKFilter } from '@nostr-dev-kit/ndk';
 
-    export let id: string;
+    export let id: string | undefined = undefined;
     export let skipReplies: boolean = false;
+    export let event: NDKEvent | undefined = undefined;
 
     const dispatcher = createEventDispatcher();
 
-    let hexid: string;
-    const decoded = nip19.decode(id);
+    let hexid: string = event?.id;
 
-    if (decoded.type === 'nevent') {
-        hexid = decoded.data.id as string;
-    } else {
-        hexid = decoded.data as string;
+    if (id) {
+        const decoded = nip19.decode(id);
+
+        if (decoded.type === 'nevent') {
+            hexid = decoded.data.id as string;
+        } else {
+            hexid = decoded.data as string;
+        }
     }
-    console.log({hexid});
 
     async function loadEvent(): Promise<NDKEvent | undefined> {
+        if (event) return event;
+
         const p: Promise<NDKEvent | undefined> = new Promise((resolve, reject) => {
             $ndk.fetchEvent({ids: [hexid]}).then((e) => {
                 if (!e) return reject(`no event ${hexid}`);
@@ -35,28 +40,39 @@
 
         return p;
     }
+
+    function dragStart(dragEvent: DragEvent, ndkEvent: NDKEvent) {
+        if (!dragEvent.dataTransfer) return;
+
+        const tag = ndkEvent.tagReference();
+
+        dragEvent.dataTransfer.setData('id', ndkEvent.id as string);
+        dragEvent.dataTransfer.setData('tag', JSON.stringify(tag));
+    }
 </script>
 
 {#await loadEvent()}
     loading {hexid}
 {:then e}
     {#if e}
-        {#if e.kind === 9802}
-            <div class="border rounded-lg border-zinc-300">
-                <HighlightCard
-                    highlight={handleEvent9802(e)}
-                    skipTitle={true}
+        <div
+            draggable={true}
+            on:dragstart={(dragEvent) => dragStart(dragEvent, e)}
+        >
+            {#if e.kind === 9802}
+                <div class="border rounded-lg border-zinc-300">
+                    <HighlightCard
+                        highlight={handleEvent9802(e)}
+                        skipTitle={true}
+                    />
+                </div>
+            {:else if e.kind === 1}
+                <NoteCard
+                    note={handleEvent1(e)}
+                    {skipReplies}
                 />
-            </div>
-        {:else if e.kind === 1}
-            <NoteCard
-                note={handleEvent1(e)}
-                skipTitle={true}
-                {skipReplies}
-            />
-        {:else}
-            event {e.kind}
-        {/if}
+            {/if}
+        </div>
     {:else}
         @{id}
     {/if}

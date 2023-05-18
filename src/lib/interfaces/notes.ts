@@ -12,7 +12,7 @@ function valueFromTag(event: NDKEvent, tag: string): string | undefined {
     if (matchingTag) return matchingTag[1];
 }
 
-interface ILoadOpts {
+export interface ILoadOpts {
     ids?: string[];
     pubkeys?: string[];
     articleId?: string;

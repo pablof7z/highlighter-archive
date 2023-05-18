@@ -36,6 +36,7 @@
 
     onMount(async () => {
         tryToLoadNip07();
+        console.log('connecting to ndk');
         await $ndk.connect();
     });
 </script>
